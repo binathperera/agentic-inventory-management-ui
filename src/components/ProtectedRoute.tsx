@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import '../styles/Loading.css';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,13 +12,8 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <p>Loading...</p>
+      <div className="loading-container">
+        <p className="loading-text">Loading...</p>
       </div>
     );
   }

@@ -15,6 +15,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// The useAuth hook is exported alongside the provider component because they are tightly coupled
+// and meant to be used together. This is the standard pattern for React context hooks.
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);

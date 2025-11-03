@@ -103,7 +103,7 @@ const Dashboard = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="toolbar-actions">
             {isAdmin() && (
               <>
                 <Link to="/users" className="btn btn-secondary">
