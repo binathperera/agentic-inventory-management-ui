@@ -9,7 +9,7 @@ import type {
   User 
 } from '../types';
 
-const API_BASE_URL = "http://65.2.31.143/api";
+const API_BASE_URL = "http://43.205.208.47/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
