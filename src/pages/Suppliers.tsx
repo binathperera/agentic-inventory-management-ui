@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supplierService } from '../services/api';
 import type { Supplier, SupplierCreateRequest } from '../types';
 import SupplierModal from '../components/SupplierModal';
+import { getUserDisplayRole } from '../utils/userUtils';
 import '../styles/Management.css';
 
 const Suppliers = () => {
@@ -85,7 +86,7 @@ const Suppliers = () => {
           <h1>Supplier Management</h1>
           <div className="user-info">
             <span className="user-name">{user?.username}</span>
-            <span className="user-role">{user?.roles[1] ? user.roles[1] : user?.roles[0]}</span>
+            <span className="user-role">{getUserDisplayRole(user)}</span>
             <button onClick={logout} className="btn btn-secondary">Logout</button>
           </div>
         </div>

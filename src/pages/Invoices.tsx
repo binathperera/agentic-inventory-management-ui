@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { invoiceService } from '../services/api';
 import type { Invoice, InvoiceCreateRequest } from '../types';
 import InvoiceModal from '../components/InvoiceModal';
+import { getUserDisplayRole } from '../utils/userUtils';
 import '../styles/Management.css';
 
 const Invoices = () => {
@@ -84,7 +85,7 @@ const Invoices = () => {
           <h1>Invoice Management</h1>
           <div className="user-info">
             <span className="user-name">{user?.username}</span>
-            <span className="user-role">{user?.roles[1] ? user.roles[1] : user?.roles[0]}</span>
+            <span className="user-role">{getUserDisplayRole(user)}</span>
             <button onClick={logout} className="btn btn-secondary">Logout</button>
           </div>
         </div>

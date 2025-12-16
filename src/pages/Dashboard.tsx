@@ -5,6 +5,7 @@ import { productService } from '../services/api';
 import type { Product, ProductCreateRequest } from '../types';
 import ProductModal from '../components/ProductModal';
 import { getProductQuantity, getProductPrice, getProductId } from '../utils/productUtils';
+import { getUserDisplayRole } from '../utils/userUtils';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
@@ -97,7 +98,7 @@ const Dashboard = () => {
           <h1>Inventory Management Dashboard</h1>
           <div className="user-info">
             <span className="user-name">{user?.username}</span>
-            <span className="user-role">{user?.roles[1] ? user.roles[1] : user?.roles[0]}</span>
+            <span className="user-role">{getUserDisplayRole(user)}</span>
             <button onClick={logout} className="btn btn-secondary">Logout</button>
           </div>
         </div>

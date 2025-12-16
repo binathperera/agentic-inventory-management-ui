@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { transactionService } from '../services/api';
 import type { Transaction, TransactionCreateRequest } from '../types';
 import TransactionModal from '../components/TransactionModal';
+import { getUserDisplayRole } from '../utils/userUtils';
 import '../styles/Management.css';
 
 const Sales = () => {
@@ -84,7 +85,7 @@ const Sales = () => {
           <h1>Sales Management</h1>
           <div className="user-info">
             <span className="user-name">{user?.username}</span>
-            <span className="user-role">{user?.roles[1] ? user.roles[1] : user?.roles[0]}</span>
+            <span className="user-role">{getUserDisplayRole(user)}</span>
             <button onClick={logout} className="btn btn-secondary">Logout</button>
           </div>
         </div>

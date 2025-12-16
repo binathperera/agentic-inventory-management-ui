@@ -21,7 +21,8 @@ export const getProductPrice = (product: Product): number => {
 
 /**
  * Get the product ID, supporting both old and new schema
+ * Prioritizes new schema (productId) over old schema (id)
  */
 export const getProductId = (product: Product): string | number | undefined => {
-  return product.id ?? product.productId;
+  return product.productId ?? product.id;
 };
