@@ -43,7 +43,12 @@ const Dashboard = () => {
     setShowModal(true);
   };
 
-  const handleDeleteProduct = async (id: number) => {
+  const handleDeleteProduct = async (id?: number) => {
+    if (!id) {
+      setError('Invalid product ID');
+      return;
+    }
+    
     if (!window.confirm('Are you sure you want to delete this product?')) {
       return;
     }
@@ -59,9 +64,10 @@ const Dashboard = () => {
 
   const handleSaveProduct = async (productData: ProductCreateRequest) => {
     try {
-      if (editingProduct) {
+      if (editingProduct && editingProduct.id) {
         await productService.updateProduct(editingProduct.id, {
           id: editingProduct.id,
+          productId: editingProduct.productId,
           ...productData
         });
       } else {
@@ -77,8 +83,8 @@ const Dashboard = () => {
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (product.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -96,6 +102,16 @@ const Dashboard = () => {
 
       <div className="dashboard-content">
         <div className="toolbar">
+          <div className="nav-links">
+            <Link to="/dashboard" className="btn btn-link active">Dashboard</Link>
+            <Link to="/suppliers" className="btn btn-link">Suppliers</Link>
+            <Link to="/invoices" className="btn btn-link">Invoices</Link>
+            <Link to="/batches" className="btn btn-link">Product Batches</Link>
+            <Link to="/sales" className="btn btn-link">Sales</Link>
+            {isAdmin() && (
+              <Link to="/users" className="btn btn-link">Users</Link>
+            )}
+          </div>
           <input
             type="text"
             placeholder="Search products..."
@@ -105,14 +121,9 @@ const Dashboard = () => {
           />
           <div className="toolbar-actions">
             {isAdmin() && (
-              <>
-                <Link to="/users" className="btn btn-secondary">
-                  User Management
-                </Link>
-                <button onClick={handleAddProduct} className="btn btn-primary">
-                  Add Product
-                </button>
-              </>
+              <button onClick={handleAddProduct} className="btn btn-primary">
+                Add Product
+              </button>
             )}
           </div>
         </div>
@@ -129,11 +140,11 @@ const Dashboard = () => {
               filteredProducts.map((product) => (
                 <div key={product.id} className="product-card">
                   <h3>{product.name}</h3>
-                  <p className="product-description">{product.description}</p>
+                  <p className="product-description">{product.description || ''}</p>
                   <div className="product-details">
-                    <span className="product-category">{product.category}</span>
-                    <span className="product-quantity">Qty: {product.quantity}</span>
-                    <span className="product-price">${product.price.toFixed(2)}</span>
+                    <span className="product-category">{product.category || ''}</span>
+                    <span className="product-quantity">Qty: {product.quantity || product.remainingQty || 0}</span>
+                    <span className="product-price">${(product.price || product.latestUnitPrice || 0).toFixed(2)}</span>
                   </div>
                   {isAdmin() && (
                     <div className="product-actions">

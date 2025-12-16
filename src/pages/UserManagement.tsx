@@ -64,6 +64,14 @@ const UserManagement = () => {
 
       <div className="dashboard-content">
         <div className="toolbar">
+          <div className="nav-links">
+            <Link to="/dashboard" className="btn btn-link">Dashboard</Link>
+            <Link to="/suppliers" className="btn btn-link">Suppliers</Link>
+            <Link to="/invoices" className="btn btn-link">Invoices</Link>
+            <Link to="/batches" className="btn btn-link">Product Batches</Link>
+            <Link to="/sales" className="btn btn-link">Sales</Link>
+            <Link to="/users" className="btn btn-link active">Users</Link>
+          </div>
           <input
             type="text"
             placeholder="Search users..."
@@ -71,9 +79,6 @@ const UserManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <Link to="/dashboard" className="btn btn-secondary">
-            Back to Dashboard
-          </Link>
         </div>
 
         {error && <div className="error-message">{error}</div>}

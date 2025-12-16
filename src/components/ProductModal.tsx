@@ -21,10 +21,10 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
   useEffect(() => {
     if (product) {
       setName(product.name);
-      setDescription(product.description);
-      setQuantity(product.quantity);
-      setPrice(product.price);
-      setCategory(product.category);
+      setDescription(product.description || '');
+      setQuantity(product.quantity || product.remainingQty || 0);
+      setPrice(product.price || product.latestUnitPrice || 0);
+      setCategory(product.category || '');
     }
   }, [product]);
 
@@ -51,6 +51,8 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
         quantity,
         price,
         category,
+        remainingQty: quantity,
+        latestUnitPrice: price,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save product');

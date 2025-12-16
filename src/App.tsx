@@ -5,6 +5,10 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
+import Suppliers from './pages/Suppliers';
+import Invoices from './pages/Invoices';
+import ProductBatches from './pages/ProductBatches';
+import Sales from './pages/Sales';
 
 function App() {
   return (
@@ -19,6 +23,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/suppliers"
+            element={
+              <ProtectedRoute>
+                <Suppliers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invoices"
+            element={
+              <ProtectedRoute>
+                <Invoices />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/batches"
+            element={
+              <ProtectedRoute>
+                <ProductBatches />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sales"
+            element={
+              <ProtectedRoute>
+                <Sales />
               </ProtectedRoute>
             }
           />
