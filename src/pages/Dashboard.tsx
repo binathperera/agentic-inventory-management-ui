@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { productService } from '../services/api';
 import type { Product, ProductCreateRequest } from '../types';
 import ProductModal from '../components/ProductModal';
+import { getProductQuantity, getProductPrice, getProductId } from '../utils/productUtils';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
@@ -43,8 +44,9 @@ const Dashboard = () => {
     setShowModal(true);
   };
 
-  const handleDeleteProduct = async (id?: number) => {
-    if (!id) {
+  const handleDeleteProduct = async (product: Product) => {
+    const productId = getProductId(product);
+    if (!productId) {
       setError('Invalid product ID');
       return;
     }
@@ -54,7 +56,8 @@ const Dashboard = () => {
     }
 
     try {
-      await productService.deleteProduct(id);
+      // Support both old and new ID formats
+      await productService.deleteProduct(typeof productId === 'number' ? productId : parseInt(productId));
       await loadProducts();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to delete product';
@@ -143,8 +146,8 @@ const Dashboard = () => {
                   <p className="product-description">{product.description || ''}</p>
                   <div className="product-details">
                     <span className="product-category">{product.category || ''}</span>
-                    <span className="product-quantity">Qty: {product.quantity || product.remainingQty || 0}</span>
-                    <span className="product-price">${(product.price || product.latestUnitPrice || 0).toFixed(2)}</span>
+                    <span className="product-quantity">Qty: {getProductQuantity(product)}</span>
+                    <span className="product-price">${getProductPrice(product).toFixed(2)}</span>
                   </div>
                   {isAdmin() && (
                     <div className="product-actions">
@@ -155,7 +158,7 @@ const Dashboard = () => {
                         Edit
                       </button>
                       <button 
-                        onClick={() => handleDeleteProduct(product.id)} 
+                        onClick={() => handleDeleteProduct(product)} 
                         className="btn btn-small btn-danger"
                       >
                         Delete

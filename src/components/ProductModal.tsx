@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import type { Product, ProductCreateRequest } from '../types';
+import { getProductQuantity, getProductPrice } from '../utils/productUtils';
 import '../styles/Modal.css';
 
 interface ProductModalProps {
@@ -22,8 +23,8 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
     if (product) {
       setName(product.name);
       setDescription(product.description || '');
-      setQuantity(product.quantity || product.remainingQty || 0);
-      setPrice(product.price || product.latestUnitPrice || 0);
+      setQuantity(getProductQuantity(product));
+      setPrice(getProductPrice(product));
       setCategory(product.category || '');
     }
   }, [product]);
@@ -45,6 +46,8 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
     setLoading(true);
 
     try {
+      // Send both old and new schema fields for backward compatibility
+      // The API will use the appropriate fields based on its version
       await onSave({
         name,
         description,
