@@ -252,6 +252,6 @@ export const transactionService = {
   deleteTransaction: async (id: string): Promise<void> => {
     await api.delete(`/transactions/${id}`);
   },
-};
+}
 
 export default api;

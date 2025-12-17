@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getSalesHistory } from '../services/api';
+import { transactionService } from '../services/api';
 
 interface Transaction {
   id: string;
@@ -15,8 +15,8 @@ const SalesHistoryTable: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getSalesHistory();
-        setTransactions(data);
+        const data = await transactionService.getAllTransactions;
+        setTransactions(data.apply);
       } catch (error) {
         console.error("Error loading sales", error);
       } finally {
