@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { supplierService } from '../services/api';
-import type { Supplier } from '../types';
-import Navigation from '../components/Navigation';
-import SupplierModal from '../components/SupplierModal';
-import SupplierTable from '../components/SupplierTable';
-import '../styles/Suppliers.css';
+import { useState, useEffect } from "react";
+import { supplierService } from "../services/api";
+import type { Supplier } from "../types";
+import Navigation from "../components/Navigation";
+import SupplierModal from "../components/SupplierModal";
+import SupplierTable from "../components/SupplierTable";
+import "../styles/Suppliers.css";
 
 const Suppliers = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadSuppliers();
@@ -23,9 +23,10 @@ const Suppliers = () => {
       setLoading(true);
       const data = await supplierService.getAllSuppliers();
       setSuppliers(data);
-      setError('');
+      setError("");
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load suppliers';
+      const message =
+        err instanceof Error ? err.message : "Failed to load suppliers";
       setError(message);
     } finally {
       setLoading(false);
@@ -43,7 +44,7 @@ const Suppliers = () => {
   };
 
   const handleDeleteSupplier = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this supplier?')) {
+    if (!window.confirm("Are you sure you want to delete this supplier?")) {
       return;
     }
 
@@ -51,15 +52,20 @@ const Suppliers = () => {
       await supplierService.deleteSupplier(id);
       await loadSuppliers();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete supplier';
+      const message =
+        err instanceof Error ? err.message : "Failed to delete supplier";
       setError(message);
     }
   };
 
-  const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (supplier.email && supplier.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (supplier.contact && supplier.contact.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      (supplier.name &&
+        supplier.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (supplier.email &&
+        supplier.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (supplier.contact &&
+        supplier.contact.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
