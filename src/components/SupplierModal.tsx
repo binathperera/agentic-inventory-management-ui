@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
-import { supplierService } from '../services/api';
-import type { Supplier, SupplierCreateRequest } from '../types';
-import '../styles/Modal.css';
+import { useState, useEffect } from "react";
+import type { FormEvent } from "react";
+import { supplierService } from "../services/api";
+import type { Supplier, SupplierCreateRequest } from "../types";
+import "../styles/Modal.css";
 
 interface SupplierModalProps {
   supplier: Supplier | null;
@@ -11,25 +11,25 @@ interface SupplierModalProps {
 }
 
 const SupplierModal = ({ supplier, onSave, onClose }: SupplierModalProps) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [contact, setContact] = useState('');
-  const [address, setAddress] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
+  const [address, setAddress] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (supplier) {
       setName(supplier.name);
-      setEmail(supplier.email || '');
-      setContact(supplier.contact || '');
-      setAddress(supplier.address || '');
+      setEmail(supplier.email || "");
+      setContact(supplier.contact || "");
+      setAddress(supplier.address || "");
     }
   }, [supplier]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -50,7 +50,7 @@ const SupplierModal = ({ supplier, onSave, onClose }: SupplierModalProps) => {
       }
       onSave();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save supplier');
+      setError(err instanceof Error ? err.message : "Failed to save supplier");
       setLoading(false);
     }
   };
@@ -59,8 +59,10 @@ const SupplierModal = ({ supplier, onSave, onClose }: SupplierModalProps) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{supplier ? 'Edit Supplier' : 'Add New Supplier'}</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <h2>{supplier ? "Edit Supplier" : "Add New Supplier"}</h2>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -116,11 +118,20 @@ const SupplierModal = ({ supplier, onSave, onClose }: SupplierModalProps) => {
           </div>
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn btn-secondary" disabled={loading}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              disabled={loading}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Supplier'}
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save Supplier"}
             </button>
           </div>
         </form>

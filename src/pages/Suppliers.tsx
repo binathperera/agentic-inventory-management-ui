@@ -21,8 +21,9 @@ const Suppliers = () => {
   const loadSuppliers = async () => {
     try {
       setLoading(true);
-      const data = await supplierService.getAllSuppliers();
-      setSuppliers(data);
+      const result = await supplierService.getAllSuppliers();
+      console.log("Fetched suppliers:", result);
+      setSuppliers(result);
       setError("");
     } catch (err) {
       const message =
@@ -58,15 +59,15 @@ const Suppliers = () => {
     }
   };
 
-  const filteredSuppliers = suppliers.filter(
-    (supplier) =>
-      (supplier.name &&
-        supplier.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (supplier.email &&
-        supplier.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (supplier.contact &&
-        supplier.contact.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // const filteredSuppliers = suppliers.filter(
+  //   (supplier) =>
+  //     (supplier.name &&
+  //       supplier.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+  //     (supplier.email &&
+  //       supplier.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+  //     (supplier.contact &&
+  //       supplier.contact.toLowerCase().includes(searchTerm.toLowerCase()))
+  // );
 
   return (
     <div className="page-with-nav">
@@ -96,7 +97,7 @@ const Suppliers = () => {
             <div className="loading">Loading suppliers...</div>
           ) : (
             <SupplierTable
-              suppliers={filteredSuppliers}
+              suppliers={suppliers}
               onEdit={handleEditSupplier}
               onDelete={handleDeleteSupplier}
             />

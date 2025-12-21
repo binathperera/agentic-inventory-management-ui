@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { invoiceService, supplierService } from '../services/api';
-import type { Invoice, Supplier } from '../types';
-import Navigation from '../components/Navigation';
-import InvoiceModal from '../components/InvoiceModal';
-import '../styles/Suppliers.css';
+import { useState, useEffect } from "react";
+import { invoiceService, supplierService } from "../services/api";
+import type { Invoice, Supplier } from "../types";
+import Navigation from "../components/Navigation";
+import InvoiceModal from "../components/InvoiceModal";
+import "../styles/Suppliers.css";
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadData();
@@ -27,9 +27,10 @@ const Invoices = () => {
       ]);
       setInvoices(invoicesData);
       setSuppliers(suppliersData);
-      setError('');
+      setError("");
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load data';
+      const message =
+        err instanceof Error ? err.message : "Failed to load data";
       setError(message);
     } finally {
       setLoading(false);
@@ -47,7 +48,7 @@ const Invoices = () => {
   };
 
   const handleDeleteInvoice = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this invoice?')) {
+    if (!window.confirm("Are you sure you want to delete this invoice?")) {
       return;
     }
 
@@ -55,19 +56,23 @@ const Invoices = () => {
       await invoiceService.deleteInvoice(id);
       await loadData();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete invoice';
+      const message =
+        err instanceof Error ? err.message : "Failed to delete invoice";
       setError(message);
     }
   };
 
   const getSupplierName = (supplierId: string) => {
-    const supplier = suppliers.find(s => s.supplierId === supplierId);
+    const supplier = suppliers.find((s) => s.supplierId === supplierId);
     return supplier ? supplier.name : supplierId;
   };
 
-  const filteredInvoices = invoices.filter(invoice =>
-    invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getSupplierName(invoice.supplierId).toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInvoices = invoices.filter(
+    (invoice) =>
+      invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getSupplierName(invoice.supplierId)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -117,7 +122,9 @@ const Invoices = () => {
                         <td>{invoice.invoiceNo}</td>
                         <td>{getSupplierName(invoice.supplierId)}</td>
                         <td>{new Date(invoice.date).toLocaleDateString()}</td>
-                        <td>{new Date(invoice.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          {new Date(invoice.createdAt).toLocaleDateString()}
+                        </td>
                         <td>
                           <div className="action-buttons">
                             <button
@@ -127,7 +134,9 @@ const Invoices = () => {
                               Edit
                             </button>
                             <button
-                              onClick={() => handleDeleteInvoice(invoice.invoiceNo)}
+                              onClick={() =>
+                                handleDeleteInvoice(invoice.invoiceNo)
+                              }
                               className="btn btn-small btn-danger"
                             >
                               Delete

@@ -1,4 +1,4 @@
-import type { Supplier } from '../types';
+import type { Supplier } from "../types";
 
 interface SupplierTableProps {
   suppliers: Supplier[];
@@ -26,9 +26,9 @@ const SupplierTable = ({ suppliers, onEdit, onDelete }: SupplierTableProps) => {
             {suppliers.map((supplier) => (
               <tr key={supplier.supplierId}>
                 <td>{supplier.name}</td>
-                <td>{supplier.email || '-'}</td>
-                <td>{supplier.contact || '-'}</td>
-                <td>{supplier.address || '-'}</td>
+                <td>{supplier.email || "-"}</td>
+                <td>{supplier.contact || "-"}</td>
+                <td>{supplier.address || "-"}</td>
                 <td>
                   <div className="action-buttons">
                     <button
