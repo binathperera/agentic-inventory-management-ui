@@ -3,6 +3,7 @@ import { supplierService } from '../services/api';
 import type { Supplier } from '../types';
 import Navigation from '../components/Navigation';
 import SupplierModal from '../components/SupplierModal';
+import SupplierTable from '../components/SupplierTable';
 import '../styles/Suppliers.css';
 
 const Suppliers = () => {
@@ -88,51 +89,11 @@ const Suppliers = () => {
           {loading ? (
             <div className="loading">Loading suppliers...</div>
           ) : (
-            <div className="table-container">
-              {filteredSuppliers.length === 0 ? (
-                <p className="no-data">No suppliers found</p>
-              ) : (
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Supplier ID</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Contact</th>
-                      <th>Address</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredSuppliers.map((supplier) => (
-                      <tr key={supplier.supplierId}>
-                        <td>{supplier.supplierId}</td>
-                        <td>{supplier.name}</td>
-                        <td>{supplier.email || '-'}</td>
-                        <td>{supplier.contact || '-'}</td>
-                        <td>{supplier.address || '-'}</td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              onClick={() => handleEditSupplier(supplier)}
-                              className="btn btn-small btn-secondary"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteSupplier(supplier.supplierId)}
-                              className="btn btn-small btn-danger"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+            <SupplierTable
+              suppliers={filteredSuppliers}
+              onEdit={handleEditSupplier}
+              onDelete={handleDeleteSupplier}
+            />
           )}
         </div>
 
