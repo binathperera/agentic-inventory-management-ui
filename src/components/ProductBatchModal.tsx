@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
-import { productBatchService } from '../services/api';
-import type { ProductBatch, ProductBatchCreateRequest, Product, Invoice } from '../types';
-import '../styles/Modal.css';
+import { useState, useEffect } from "react";
+import type { FormEvent } from "react";
+import { productBatchService } from "../services/api";
+import type { ProductBatch, ProductBatchCreateRequest, Product, Invoice } from "../types";
+import "../styles/Modal.css";
 
 interface ProductBatchModalProps {
   batch: ProductBatch | null;
@@ -13,14 +13,14 @@ interface ProductBatchModalProps {
 }
 
 const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: ProductBatchModalProps) => {
-  const [productId, setProductId] = useState('');
-  const [invoiceNo, setInvoiceNo] = useState('');
-  const [batchNo, setBatchNo] = useState('');
+  const [productId, setProductId] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [batchNo, setBatchNo] = useState("");
   const [qty, setQty] = useState(0);
   const [unitCost, setUnitCost] = useState(0);
   const [unitPrice, setUnitPrice] = useState(0);
-  const [exp, setExp] = useState('');
-  const [error, setError] = useState('');
+  const [exp, setExp] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -31,36 +31,36 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
       setQty(batch.qty);
       setUnitCost(batch.unitCost);
       setUnitPrice(batch.unitPrice);
-      setExp(batch.exp ? batch.exp.split('T')[0] : '');
+      setExp(batch.exp ? batch.exp.split("T")[0] : "");
     }
   }, [batch]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!productId) {
-      setError('Please select a product');
+      setError("Please select a product");
       return;
     }
 
     if (!invoiceNo) {
-      setError('Please select an invoice');
+      setError("Please select an invoice");
       return;
     }
 
     if (qty <= 0) {
-      setError('Quantity must be greater than 0');
+      setError("Quantity must be greater than 0");
       return;
     }
 
     if (unitCost < 0) {
-      setError('Unit cost cannot be negative');
+      setError("Unit cost cannot be negative");
       return;
     }
 
     if (unitPrice < 0) {
-      setError('Unit price cannot be negative');
+      setError("Unit price cannot be negative");
       return;
     }
 
@@ -84,7 +84,7 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
       }
       onSave();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save batch');
+      setError(err instanceof Error ? err.message : "Failed to save batch");
       setLoading(false);
     }
   };
@@ -93,7 +93,7 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{batch ? 'Edit Product Batch' : 'Add New Product Batch'}</h2>
+          <h2>{batch ? "Edit Product Batch" : "Add New Product Batch"}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -230,7 +230,7 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Batch'}
+              {loading ? "Saving..." : "Save Batch"}
             </button>
           </div>
         </form>
