@@ -7,7 +7,7 @@ interface ProductTableProps {
   isAdmin: boolean;
 }
 
-const ProductTable = ({ products, onEdit, onDelete, isAdmin }: ProductTableProps) => {
+const ProductTable = ({ products, onEdit, onDelete}: ProductTableProps) => {
   return (
     <div className="table-container">
       {products.length === 0 ? (
@@ -16,14 +16,14 @@ const ProductTable = ({ products, onEdit, onDelete, isAdmin }: ProductTableProps
         <table className="data-table">
           <thead>
             <tr>
-              <th>sku</th>
               <th>Name</th>
+              <th>SKU</th>
               <th>Description</th>
               <th>Price</th>
               <th>Quantity</th>
               <th>Category</th>
               <th>Supplier</th>
-              {isAdmin && <th>Actions</th>}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -36,7 +36,7 @@ const ProductTable = ({ products, onEdit, onDelete, isAdmin }: ProductTableProps
                 <td>{product.quantity || 0}</td>
                 <td>{product.category || '-'}</td>
                 <td>{product.supplier || '-'}</td>
-                {isAdmin && (
+                 (
                   <td>
                     <div className="action-buttons">
                       <button
@@ -53,7 +53,7 @@ const ProductTable = ({ products, onEdit, onDelete, isAdmin }: ProductTableProps
                       </button>
                     </div>
                   </td>
-                )}
+                )
               </tr>
             ))}
           </tbody>
