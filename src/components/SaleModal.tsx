@@ -68,7 +68,7 @@ const SaleModal = ({ transaction, products, onSave, onClose }: SaleModalProps) =
       // Auto-populate unit price from product
       const product = products.find(p => p.productId === value);
       if (product) {
-        newItems[index].unitPrice = product.latestUnitPrice;
+        newItems[index].unitPrice = product.price ?? 0;
       }
     } else {
       newItems[index][field] = value as number;

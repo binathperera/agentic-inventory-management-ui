@@ -26,13 +26,18 @@ export interface AuthResponse {
 }
 
 // Product types matching new schema
-export interface Product {
+export type Product = {
   tenantId: string;
   productId: string;
+  sku: string;
   name: string;
-  latestBatchNo?: string;
-  remainingQty: number;
-  latestUnitPrice: number;
+  description?: string;
+  price?: number;
+  quantity?: number;
+  category?: string;
+  supplier?: string;
+  latestUnitPrice?: number;
+  remainingQty?: number;
   createdAt: string;
   updatedAt: string;
   schemaVersion: number;
