@@ -36,8 +36,7 @@ const ProductTable = ({ products, onEdit, onDelete}: ProductTableProps) => {
                 <td>{product.quantity || 0}</td>
                 <td>{product.category || '-'}</td>
                 <td>{product.supplier || '-'}</td>
-                 (
-                  <td>
+                <td>
                     <div className="action-buttons">
                       <button
                         onClick={() => onEdit(product)}
@@ -53,7 +52,6 @@ const ProductTable = ({ products, onEdit, onDelete}: ProductTableProps) => {
                       </button>
                     </div>
                   </td>
-                )
               </tr>
             ))}
           </tbody>
