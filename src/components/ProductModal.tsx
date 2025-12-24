@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
-import type { Product, ProductCreateRequest } from '../types';
-import '../styles/Modal.css';
+import { useState, useEffect } from "react";
+import type { FormEvent } from "react";
+import type { Product, ProductCreateRequest } from "../types";
+import "../styles/Modal.css";
 
 interface ProductModalProps {
   product: Product | null;
@@ -10,17 +10,17 @@ interface ProductModalProps {
 }
 
 const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [remainingQty, setRemainingQty] = useState(0);
   const [latestUnitPrice, setLatestUnitPrice] = useState(0);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (product) {
       setName(product.name);
-      setRemainingQty(product.remainingQty);
-      setLatestUnitPrice(product.latestUnitPrice);
+      setRemainingQty(product.remainingQty ?? 0);
+      setLatestUnitPrice(product.latestUnitPrice ?? 0);
     }
   }, [product]);
 
@@ -29,12 +29,12 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
     setError('');
 
     if (remainingQty < 0) {
-      setError('Quantity cannot be negative');
+      setError("Quantity cannot be negative");
       return;
     }
 
     if (latestUnitPrice < 0) {
-      setError('Price cannot be negative');
+      setError("Price cannot be negative");
       return;
     }
 
@@ -47,7 +47,7 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
         latestUnitPrice,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save product');
+      setError(err instanceof Error ? err.message : "Failed to save product");
       setLoading(false);
     }
   };
@@ -56,7 +56,7 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{product ? 'Edit Product' : 'Add New Product'}</h2>
+          <h2>{product ? "Edit Product" : "Add New Product"}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -114,7 +114,7 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Product'}
+              {loading ? "Saving..." : "Save Product"}
             </button>
           </div>
         </form>
