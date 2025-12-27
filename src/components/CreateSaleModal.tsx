@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createTransaction } from '../services/api';
+import  createTransaction  from '../services/api';
 
 interface Props {
     isOpen: boolean;
@@ -22,13 +22,15 @@ const CreateSaleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await createTransaction({
-                paymentMethod,
-                grossAmount,
-                discount,
-                totalAmount: netAmount, // This maps to "totalAmount" in Java
-                paidAmount,
-                balance
+            await createTransaction('/api/transactions', {
+                data: {
+                    paymentMethod,
+                    grossAmount,
+                    discount,
+                    totalAmount: netAmount, // This maps to "totalAmount" in Java
+                    paidAmount,
+                    balance
+                }
             });
             alert("Sale Saved!");
             onSuccess();

@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import CreateSaleModal from '../components/CreateSaleModal';
-import { getSalesHistory } from '../services/api';
+import { transactionService } from '../services/api';
+import type { Transaction } from '../types';
+
 
 const SalesPage: React.FC = () => {
     const [isModalOpen, setModalOpen] = useState(false);
-    const [sales, setSales] = useState<any[]>([]);
+    const [sales, setSales] = useState<Transaction[]>([]);
 
     const loadSales = async () => {
-        try {
-            const data = await getSalesHistory();
-            setSales(data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+   try {
+    const data = await transactionService.getAllTransactions();
+    setSales(data);
+   } catch (error) {
+    console.error('Failed to load sales:', error);
+   }
+   };
+
 
     useEffect(() => { loadSales(); }, []);
 
@@ -38,13 +41,13 @@ const SalesPage: React.FC = () => {
                     </thead>
                     <tbody>
                         {sales.map((sale) => (
-                            <tr key={sale.id} className="border-b">
+                            <tr key={sale.transactionId} className="border-b">
                                 <td className="px-5 py-5 bg-white text-sm">
                                     {sale.createdAt ? new Date(sale.createdAt).toLocaleDateString() : 'Just now'}
                                 </td>
                                 <td className="px-5 py-5 bg-white text-sm">{sale.paymentMethod}</td>
-                                <td className="px-5 py-5 bg-white text-sm font-bold">${sale.totalAmount}</td>
-                                <td className="px-5 py-5 bg-white text-sm text-red-500">${sale.balance}</td>
+                                <td className="px-5 py-5 bg-white text-sm font-bold">${sale.grossAmount}</td>
+                                <td className="px-5 py-5 bg-white text-sm text-red-500">${sale.balanceAmount}</td>
                             </tr>
                         ))}
                     </tbody>
