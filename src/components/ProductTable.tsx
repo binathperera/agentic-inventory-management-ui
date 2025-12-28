@@ -1,5 +1,6 @@
 import type { Product } from '../types';
 
+
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
@@ -17,12 +18,9 @@ const ProductTable = ({ products, onEdit, onDelete}: ProductTableProps) => {
           <thead>
             <tr>
               <th>Name</th>
-              <th>SKU</th>
-              <th>Description</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Category</th>
-              <th>Supplier</th>
+              <th>Latest Batch No.</th>
+              <th>Remaining qty.</th>
+              <th>Unit Price</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -30,12 +28,9 @@ const ProductTable = ({ products, onEdit, onDelete}: ProductTableProps) => {
             {products.map((product) => (
               <tr key={product.productId}>
                 <td>{product.name}</td>
-                <td>{product.sku}</td>
-                <td>{product.description || '-'}</td>
-                <td>₹{product.price?.toFixed(2) || '-'}</td>
-                <td>{product.quantity || 0}</td>
-                <td>{product.category || '-'}</td>
-                <td>{product.supplier || '-'}</td>
+                <td>{product.remainingQty?.toFixed(2)}</td>
+                <td>{product.remainingQty?.toFixed(2)}</td>
+                <td>₹{product.latestUnitPrice?.toFixed(2)}</td>
                 <td>
                     <div className="action-buttons">
                       <button
