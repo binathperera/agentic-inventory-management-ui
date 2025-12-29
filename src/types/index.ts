@@ -23,6 +23,7 @@ export interface AuthResponse {
   username: string;
   email: string;
   roles: string[];
+  errorMessage?: string;
 }
 
 // Product types matching new schema
