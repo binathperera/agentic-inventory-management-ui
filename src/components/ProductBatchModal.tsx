@@ -1,18 +1,31 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { productBatchService } from "../services/api";
-import type { ProductBatch, ProductBatchCreateRequest, Product, Invoice } from "../types";
+import type {
+  ProductBatch,
+  ProductBatchCreateRequest,
+  Product,
+  Invoice,
+} from "../types";
 import "../styles/Modal.css";
 
 interface ProductBatchModalProps {
   batch: ProductBatch | null;
   products: Product[];
   invoices: Invoice[];
+  selectedProductId?: string;
   onSave: () => void;
   onClose: () => void;
 }
 
-const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: ProductBatchModalProps) => {
+const ProductBatchModal = ({
+  batch,
+  products,
+  invoices,
+  selectedProductId,
+  onSave,
+  onClose,
+}: ProductBatchModalProps) => {
   const [productId, setProductId] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("");
   const [batchNo, setBatchNo] = useState("");
@@ -23,6 +36,9 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const getProductKey = (product: Product & { productId?: string }) =>
+    product.id || product.productId || "";
+
   useEffect(() => {
     if (batch) {
       setProductId(batch.productId);
@@ -32,8 +48,16 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
       setUnitCost(batch.unitCost);
       setUnitPrice(batch.unitPrice);
       setExp(batch.exp ? batch.exp.split("T")[0] : "");
+    } else if (selectedProductId) {
+      setProductId(selectedProductId);
+      setInvoiceNo("");
+      setBatchNo("");
+      setQty(0);
+      setUnitCost(0);
+      setUnitPrice(0);
+      setExp("");
     }
-  }, [batch]);
+  }, [batch, selectedProductId]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -78,7 +102,11 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
       };
 
       if (batch) {
-        await productBatchService.updateBatch(batch.productId, batch.invoiceNo, batchData);
+        await productBatchService.updateBatch(
+          batch.productId,
+          batch.invoiceNo,
+          batchData
+        );
       } else {
         await productBatchService.createBatch(batchData);
       }
@@ -94,7 +122,9 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{batch ? "Edit Product Batch" : "Add New Product Batch"}</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -107,24 +137,32 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
               required
-              disabled={loading || !!batch}
+              disabled={loading || !!batch || !!selectedProductId}
               style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-                fontSize: '14px',
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "5px",
+                fontSize: "14px",
               }}
             >
               <option value="">Select a product</option>
-              {products.map((product) => (
-                <option key={product.productId} value={product.productId}>
-                  {product.name}
-                </option>
-              ))}
+              {products.map((product) => {
+                const pid = getProductKey(product);
+                if (!pid) {
+                  return null;
+                }
+                return (
+                  <option key={pid} value={pid}>
+                    {pid} — {product.name}
+                  </option>
+                );
+              })}
             </select>
-            {batch && (
-              <small style={{ color: '#666', fontSize: '12px' }}>Product cannot be changed</small>
+            {(batch || selectedProductId) && (
+              <small style={{ color: "#666", fontSize: "12px" }}>
+                Product cannot be changed
+              </small>
             )}
           </div>
 
@@ -137,22 +175,25 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
               required
               disabled={loading || !!batch}
               style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-                fontSize: '14px',
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "5px",
+                fontSize: "14px",
               }}
             >
               <option value="">Select an invoice</option>
               {invoices.map((invoice) => (
                 <option key={invoice.invoiceNo} value={invoice.invoiceNo}>
-                  {invoice.invoiceNo} - {new Date(invoice.date).toLocaleDateString()}
+                  {invoice.invoiceNo} -{" "}
+                  {new Date(invoice.date).toLocaleDateString()}
                 </option>
               ))}
             </select>
             {batch && (
-              <small style={{ color: '#666', fontSize: '12px' }}>Invoice cannot be changed</small>
+              <small style={{ color: "#666", fontSize: "12px" }}>
+                Invoice cannot be changed
+              </small>
             )}
           </div>
 
@@ -226,10 +267,19 @@ const ProductBatchModal = ({ batch, products, invoices, onSave, onClose }: Produ
           </div>
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn btn-secondary" disabled={loading}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              disabled={loading}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
               {loading ? "Saving..." : "Save Batch"}
             </button>
           </div>

@@ -13,6 +13,7 @@ const Suppliers = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("name");
 
   useEffect(() => {
     loadSuppliers();
@@ -69,25 +70,99 @@ const Suppliers = () => {
   //       supplier.contact.toLowerCase().includes(searchTerm.toLowerCase()))
   // );
 
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (supplier.email &&
+        supplier.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (supplier.contact &&
+        supplier.contact.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const sortedSuppliers = [...filteredSuppliers].sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "email") return (a.email || "").localeCompare(b.email || "");
+
+    return 0;
+  });
+
   return (
     <div className="page-with-nav">
       <Navigation />
       <div className="page-content">
         <div className="page-header">
           <h1>Supplier Management</h1>
+          <p className="subtitle">
+            Manage your suppliers and their information
+          </p>
+        </div>
+
+        {/* Supplier Statistics */}
+        <div className="stats-container">
+          <div className="stat-card">
+            <div className="stat-icon">🏢</div>
+            <div className="stat-content">
+              <div className="stat-label">Total Suppliers</div>
+              <div className="stat-value">{suppliers.length}</div>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">✉️</div>
+            <div className="stat-content">
+              <div className="stat-label">Verified Contacts</div>
+              <div className="stat-value">
+                {suppliers.filter((s) => s.email).length}
+              </div>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">📞</div>
+            <div className="stat-content">
+              <div className="stat-label">With Phone</div>
+              <div className="stat-value">
+                {suppliers.filter((s) => s.contact).length}
+              </div>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">📍</div>
+            <div className="stat-content">
+              <div className="stat-label">Locations</div>
+              <div className="stat-value">
+                {
+                  [...new Set(suppliers.map((s) => s.address).filter(Boolean))]
+                    .length
+                }
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="content-wrapper">
           <div className="toolbar">
-            <input
-              type="text"
-              placeholder="Search suppliers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
+            <div className="toolbar-section">
+              <input
+                type="text"
+                placeholder="Search by name, email, or contact..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
+
+            <div className="toolbar-section">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="filter-select"
+              >
+                <option value="name">Sort by Name</option>
+                <option value="email">Sort by Email</option>
+              </select>
+            </div>
+
             <button onClick={handleAddSupplier} className="btn btn-primary">
-              Add Supplier
+              + Add Supplier
             </button>
           </div>
 
@@ -95,9 +170,16 @@ const Suppliers = () => {
 
           {loading ? (
             <div className="loading">Loading suppliers...</div>
+          ) : sortedSuppliers.length === 0 ? (
+            <div className="no-data">
+              <p>No suppliers found</p>
+              <button onClick={handleAddSupplier} className="btn btn-primary">
+                Create First Supplier
+              </button>
+            </div>
           ) : (
             <SupplierTable
-              suppliers={suppliers}
+              suppliers={sortedSuppliers}
               onEdit={handleEditSupplier}
               onDelete={handleDeleteSupplier}
             />

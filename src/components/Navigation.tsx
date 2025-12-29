@@ -27,6 +27,15 @@ const Navigation = () => {
             to="/dashboard"
             className={`nav-link ${isActive("/dashboard")}`}
           >
+            <span className="nav-icon">📊</span>
+            Dashboard
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/inventory"
+            className={`nav-link ${isActive("/inventory")}`}
+          >
             <span className="nav-icon">📦</span>
             Inventory
           </Link>
@@ -59,12 +68,23 @@ const Navigation = () => {
           </Link>
         </li>
         {isAdmin() && (
-          <li>
-            <Link to="/users" className={`nav-link ${isActive("/users")}`}>
-              <span className="nav-icon">👥</span>
-              Users
-            </Link>
-          </li>
+          <>
+            <li>
+              <Link to="/users" className={`nav-link ${isActive("/users")}`}>
+                <span className="nav-icon">👥</span>
+                Users
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/settings"
+                className={`nav-link ${isActive("/settings")}`}
+              >
+                <span className="nav-icon">⚙️</span>
+                Settings
+              </Link>
+            </li>
+          </>
         )}
       </ul>
       <div className="nav-footer">

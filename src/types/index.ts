@@ -27,46 +27,34 @@ export interface AuthResponse {
 
 // Product types matching new schema
 export type Product = {
-  tenantId: string;
-  productId: string;
-  sku: string;
+  id: string;
   name: string;
-  description?: string;
-  price?: number;
-  quantity?: number;
-  category?: string;
-  supplier?: string;
-  latestUnitPrice?: number;
-  remainingQty?: number;
-  createdAt: string;
-  updatedAt: string;
-  schemaVersion: number;
-}
+  latestBatchNo: string;
+  remainingQuantity?: number;
+  latestUnitPrice: number;
+};
 
 export interface ProductCreateRequest {
+  id: string;
   name: string;
-  remainingQty?: number;
+  remainingQuantity?: number;
   latestUnitPrice?: number;
 }
 
 export interface ProductUpdateRequest {
-  productId: string;
+  id: string;
   name: string;
-  remainingQty?: number;
+  remainingQuantity?: number;
   latestUnitPrice?: number;
 }
 
 // Supplier types
 export interface Supplier {
-  tenantId: string;
-  supplierId: string;
+  id: string;
   name: string;
   email?: string;
   address?: string;
   contact?: string;
-  createdAt: string;
-  updatedAt: string;
-  schemaVersion: number;
 }
 
 export interface SupplierCreateRequest {
@@ -77,7 +65,7 @@ export interface SupplierCreateRequest {
 }
 
 export interface SupplierUpdateRequest {
-  supplierId: string;
+  id: string;
   name: string;
   email?: string;
   address?: string;
@@ -86,14 +74,10 @@ export interface SupplierUpdateRequest {
 
 // Invoice types
 export interface Invoice {
-  tenantId: string;
   invoiceNo: string;
-  supplierId: string;
+  id: string;
   date: string;
-  createdAt: string;
-  updatedAt: string;
-  schemaVersion: number;
-  supplier?: Supplier;
+  supplierId: string;
 }
 
 export interface InvoiceCreateRequest {
@@ -103,6 +87,7 @@ export interface InvoiceCreateRequest {
 }
 
 export interface InvoiceUpdateRequest {
+  id: string;
   invoiceNo: string;
   supplierId: string;
   date: string;
@@ -110,7 +95,7 @@ export interface InvoiceUpdateRequest {
 
 // Product Batch types
 export interface ProductBatch {
-  tenantId: string;
+  id: string;
   productId: string;
   invoiceNo: string;
   batchNo: string;
@@ -118,11 +103,6 @@ export interface ProductBatch {
   unitCost: number;
   unitPrice: number;
   exp?: string;
-  createdAt: string;
-  updatedAt: string;
-  schemaVersion: number;
-  product?: Product;
-  invoice?: Invoice;
 }
 
 export interface ProductBatchCreateRequest {
@@ -147,7 +127,7 @@ export interface ProductBatchUpdateRequest {
 
 // Transaction types
 export interface Transaction {
-  tenantId: string;
+  id: string;
   transactionId: string;
   paymentMethod: string;
   grossAmount: number;
@@ -155,10 +135,6 @@ export interface Transaction {
   netAmount: number;
   paidAmount: number;
   balanceAmount: number;
-  createdAt: string;
-  updatedAt: string;
-  schemaVersion: number;
-  items?: TransactionItem[];
 }
 
 export interface TransactionCreateRequest {
@@ -190,12 +166,50 @@ export interface TransactionItem {
   unitPrice: number;
   createdAt: string;
   updatedAt: string;
-  schemaVersion: number;
-  product?: Product;
 }
 
 export interface TransactionItemCreateRequest {
   productId: string;
   qty: number;
   unitPrice: number;
+}
+
+// Tenant Config types
+export interface TenantConfig {
+  id?: string;
+  brand?: Brand;
+  uiTheme?: UiTheme;
+  localization?: Localization;
+  features?: Features;
+}
+
+export interface Brand {
+  name?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  bannerUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  fontFamily?: string;
+}
+
+export interface UiTheme {
+  mode?: string; // 'light', 'dark', 'auto'
+  accentColor?: string;
+  layoutStyle?: string; // 'compact', 'comfortable', 'spacious'
+  cornerStyle?: string; // 'rounded', 'sharp', 'smooth'
+}
+
+export interface Localization {
+  language?: string; // 'en', 'es', 'fr', etc.
+  timezone?: string; // 'America/New_York', 'UTC', etc.
+  currency?: string; // 'USD', 'EUR', 'GBP', etc.
+  dateFormat?: string; // 'MM/DD/YYYY', 'DD/MM/YYYY', etc.
+}
+
+export interface Features {
+  inventoryModule?: boolean;
+  reportingModule?: boolean;
+  supplierManagement?: boolean;
+  advancedPricing?: boolean;
 }
