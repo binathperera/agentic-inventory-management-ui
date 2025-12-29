@@ -19,6 +19,7 @@ import type {
   Transaction,
   TransactionCreateRequest,
   TransactionUpdateRequest,
+  TenantConfig,
 } from "../types";
 
 const API_BASE_URL = "http://localhost:8080/api";
@@ -36,6 +37,9 @@ api.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("[API] Token found, Authorization header set");
+    } else {
+      console.log("[API] No token found in localStorage");
     }
     return config;
   },
@@ -49,11 +53,22 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear authentication data on 401 errors
-      // The app will redirect to login through the AuthContext
+      console.log("[API] 401 Unauthorized - clearing auth");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     }
+
+    // Log all errors for debugging
+    if (error.response?.status === 400 || error.response?.status === 403) {
+      console.error(`[API] ${error.response?.status} Error:`);
+      console.error("  URL:", error.config?.url);
+      console.error("  Method:", error.config?.method);
+      console.error("  Response Data:", error.response?.data);
+      console.error("  Auth Header:", error.config?.headers?.Authorization);
+      console.error("  Status:", error.response?.status);
+      console.error("  Status Text:", error.response?.statusText);
+    }
+
     return Promise.reject(error);
   }
 );
@@ -97,6 +112,7 @@ export const productService = {
     id: string,
     product: ProductUpdateRequest
   ): Promise<Product> => {
+    console.log("Updating product:", id, product);
     const response = await api.put<Product>(`/products/${id}`, product);
     return response.data;
   },
@@ -140,7 +156,9 @@ export const supplierService = {
     return response.data;
   },
 
-  createSupplier: async (supplier: SupplierCreateRequest): Promise<Supplier> => {
+  createSupplier: async (
+    supplier: SupplierCreateRequest
+  ): Promise<Supplier> => {
     const response = await api.post<Supplier>("/suppliers", supplier);
     return response.data;
   },
@@ -191,22 +209,31 @@ export const invoiceService = {
 // Product Batch APIs
 export const productBatchService = {
   getAllBatches: async (): Promise<ProductBatch[]> => {
-    const response = await api.get<ProductBatch[]>("/batches");
+    const response = await api.get<ProductBatch[]>("/product-batches");
     return response.data;
   },
 
   getBatchesByProduct: async (productId: string): Promise<ProductBatch[]> => {
-    const response = await api.get<ProductBatch[]>(`/batches/product/${productId}`);
+    const response = await api.get<ProductBatch[]>(
+      `/product-batches/product/${productId}`
+    );
     return response.data;
   },
 
-  getBatchById: async (productId: string, invoiceNo: string): Promise<ProductBatch> => {
-    const response = await api.get<ProductBatch>(`/batches/${productId}/${invoiceNo}`);
+  getBatchById: async (
+    productId: string,
+    invoiceNo: string
+  ): Promise<ProductBatch> => {
+    const response = await api.get<ProductBatch>(
+      `/product-batches/${productId}/${invoiceNo}`
+    );
     return response.data;
   },
 
-  createBatch: async (batch: ProductBatchCreateRequest): Promise<ProductBatch> => {
-    const response = await api.post<ProductBatch>("/batches", batch);
+  createBatch: async (
+    batch: ProductBatchCreateRequest
+  ): Promise<ProductBatch> => {
+    const response = await api.post<ProductBatch>("/product-batches", batch);
     return response.data;
   },
 
@@ -215,12 +242,15 @@ export const productBatchService = {
     invoiceNo: string,
     batch: ProductBatchUpdateRequest
   ): Promise<ProductBatch> => {
-    const response = await api.put<ProductBatch>(`/batches/${productId}/${invoiceNo}`, batch);
+    const response = await api.put<ProductBatch>(
+      `/product-batches/${productId}/${invoiceNo}`,
+      batch
+    );
     return response.data;
   },
 
   deleteBatch: async (productId: string, invoiceNo: string): Promise<void> => {
-    await api.delete(`/batches/${productId}/${invoiceNo}`);
+    await api.delete(`/product-batches/${productId}/${invoiceNo}`);
   },
 };
 
@@ -236,7 +266,9 @@ export const transactionService = {
     return response.data;
   },
 
-  createTransaction: async (transaction: TransactionCreateRequest): Promise<Transaction> => {
+  createTransaction: async (
+    transaction: TransactionCreateRequest
+  ): Promise<Transaction> => {
     const response = await api.post<Transaction>("/transactions", transaction);
     return response.data;
   },
@@ -245,13 +277,41 @@ export const transactionService = {
     id: string,
     transaction: TransactionUpdateRequest
   ): Promise<Transaction> => {
-    const response = await api.put<Transaction>(`/transactions/${id}`, transaction);
+    const response = await api.put<Transaction>(
+      `/transactions/${id}`,
+      transaction
+    );
     return response.data;
   },
 
   deleteTransaction: async (id: string): Promise<void> => {
     await api.delete(`/transactions/${id}`);
   },
-}
+};
+
+// Tenant Config APIs
+export const tenantConfigService = {
+  getTenantConfig: async (): Promise<TenantConfig> => {
+    const response = await api.get<TenantConfig>("/tenant-config");
+    return response.data;
+  },
+
+  updateTenantConfig: async (config: TenantConfig): Promise<TenantConfig> => {
+    const response = await api.put<TenantConfig>("/tenant-config", config);
+    return response.data;
+  },
+
+  initializeTenantConfig: async (): Promise<TenantConfig> => {
+    const response = await api.post<TenantConfig>("/tenant-config/initialize");
+    return response.data;
+  },
+
+  getConfigBySubDomain: async (subDomain: string): Promise<TenantConfig> => {
+    const response = await api.get<TenantConfig>(
+      `/tenant-config/by-subdomain/${subDomain}`
+    );
+    return response.data;
+  },
+};
 
 export default api;

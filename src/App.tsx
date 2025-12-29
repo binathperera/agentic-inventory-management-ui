@@ -1,14 +1,21 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
-import Suppliers from './pages/Suppliers';
-import Invoices from './pages/Invoices';
-import ProductBatches from './pages/ProductBatches';
-import Sales from './pages/Sales';
-import UserManagement from './pages/UserManagement';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import Inventory from "./pages/Inventory";
+import Suppliers from "./pages/Suppliers";
+import Invoices from "./pages/Invoices";
+import ProductBatches from "./pages/ProductBatches";
+import Sales from "./pages/Sales";
+import UserManagement from "./pages/UserManagement";
+import TenantSettings from "./pages/TenantSettings";
 
 function App() {
   return (
@@ -23,6 +30,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute>
+                <Inventory />
               </ProtectedRoute>
             }
           />
@@ -63,6 +78,14 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <UserManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <TenantSettings />
               </ProtectedRoute>
             }
           />

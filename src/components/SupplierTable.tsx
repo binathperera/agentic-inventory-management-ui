@@ -24,7 +24,7 @@ const SupplierTable = ({ suppliers, onEdit, onDelete }: SupplierTableProps) => {
           </thead>
           <tbody>
             {suppliers.map((supplier) => (
-              <tr key={supplier.supplierId}>
+              <tr key={supplier.id}>
                 <td>{supplier.name}</td>
                 <td>{supplier.email || "-"}</td>
                 <td>{supplier.contact || "-"}</td>
@@ -38,7 +38,7 @@ const SupplierTable = ({ suppliers, onEdit, onDelete }: SupplierTableProps) => {
                       Edit
                     </button>
                     <button
-                      onClick={() => onDelete(supplier.supplierId)}
+                      onClick={() => onDelete(supplier.id)}
                       className="btn btn-small btn-danger"
                     >
                       Delete

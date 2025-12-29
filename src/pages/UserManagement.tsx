@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { userService } from '../services/api';
-import type { User } from '../types';
-import Navigation from '../components/Navigation';
-import '../styles/Suppliers.css';
+import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { userService } from "../services/api";
+import type { User } from "../types";
+import Navigation from "../components/Navigation";
+import "../styles/Suppliers.css";
 
 const UserManagement = () => {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadUsers();
@@ -21,9 +21,10 @@ const UserManagement = () => {
       setLoading(true);
       const data = await userService.getAllUsers();
       setUsers(data);
-      setError('');
+      setError("");
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load users';
+      const message =
+        err instanceof Error ? err.message : "Failed to load users";
       setError(message);
     } finally {
       setLoading(false);
@@ -31,7 +32,7 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = async (username: string) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) {
+    if (!window.confirm("Are you sure you want to delete this user?")) {
       return;
     }
 
@@ -39,14 +40,16 @@ const UserManagement = () => {
       await userService.deleteUser(username);
       await loadUsers();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete user';
+      const message =
+        err instanceof Error ? err.message : "Failed to delete user";
       setError(message);
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -92,8 +95,16 @@ const UserManagement = () => {
                         <td>{user.username}</td>
                         <td>{user.email}</td>
                         <td>
-                          <span className={`role-badge role-${user.roles[0].toLowerCase()}`}>
-                            {user.roles[0]}
+                          <span
+                            className={`role-badge role-${
+                              typeof user.roles[0] === "string"
+                                ? user.roles[0].toLowerCase()
+                                : String(user.roles[0]).toLowerCase()
+                            }`}
+                          >
+                            {typeof user.roles[0] === "string"
+                              ? user.roles[0]
+                              : String(user.roles[0])}
                           </span>
                         </td>
                         <td>
