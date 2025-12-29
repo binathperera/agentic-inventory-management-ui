@@ -1,0 +1,153 @@
+/* ================= PAGE ================= */
+.page-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  font-family: "Segoe UI", sans-serif;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+.top-nav {
+  max-width: 1200px;
+  margin: auto;
+  padding: 22px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.logo-click {
+  cursor: pointer;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 26px;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-menu li {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.nav-menu li:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.login-btn {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 8px 24px;
+  border-radius: 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background: white;
+  color: #667eea;
+}
+
+/* ================= HERO ================= */
+.hero-container {
+  max-width: 1200px;
+  margin: 80px auto 0;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px;
+  align-items: center;
+}
+
+/* LEFT CARD */
+.hero-card-left {
+  background: white;
+  color: #333;
+  padding: 48px 44px;
+  border-radius: 18px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+}
+
+.hero-card-left h2 {
+  font-size: 30px;
+  margin-bottom: 14px;
+  color: #222;
+}
+
+.hero-card-left p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 28px;
+}
+
+/* EMAIL BUTTON */
+.email-btn {
+  display: inline-block;
+  padding: 14px 38px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 30px;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(102, 126, 234, 0.45);
+}
+
+.email-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(102, 126, 234, 0.6);
+}
+
+/* RIGHT IMAGE CARD */
+.hero-card-right {
+  height: 280px;
+  border-radius: 22px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d")
+      center / cover no-repeat;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .nav-menu {
+    display: none;
+  }
+
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+}
