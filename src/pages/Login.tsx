@@ -1,34 +1,32 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import '../styles/Auth.css';
+import { useState } from "react";
+import type { FormEvent } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import "../styles/Auth.css";
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const user = await login({ username, password });
-      if (user?.errorMessage !== '' && user?.errorMessage != null) {
-        setError(user.errorMessage || 'Login failed. Please try again.');
-      } else if (user) {
-        navigate('/dashboard');
-      } else {
-        setError('Login failed. Please try again.');
-      }
-    } catch {
-      setError('Login failed. Please try again later.');
+      await login({ username, password });
+      navigate("/dashboard");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Login failed. Please try again later.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -39,9 +37,9 @@ const Login = () => {
       <div className="auth-card">
         <h1>Inventory Management System</h1>
         <h2>Login</h2>
-        
+
         {error && <div className="error-message">{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">Username</label>
@@ -70,7 +68,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
