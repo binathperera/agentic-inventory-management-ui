@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "../components/Navigation";
 import "../styles/Dashboard.css";
 import { aiChatService } from "../services/api";
@@ -11,6 +11,8 @@ import {
   AlertTriangle,
   TrendingUp,
 } from "lucide-react";
+import type { Product } from "../types";
+import { productService } from "../services/api";
 
 const Dashboard = () => {
   const [prompt, setPrompt] = useState("");
@@ -18,6 +20,26 @@ const Dashboard = () => {
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await productService.getAllProducts();
+      setProducts(data);
+      setError("");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load products";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAsk = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,6 +61,10 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+   const lowStockCount = products.filter(
+    (p) => (p.remainingQuantity || 0) < 10
+  ).length;
 
   return (
     <div className="page-with-nav">
@@ -73,7 +99,7 @@ const Dashboard = () => {
                   id="ai-chat-prompt"
                   className="ai-chat-input"
                   rows={3}
-                  placeholder="Example: Show me items with quantity less than 10 in Stock"
+                  placeholder="Example: Show me items with quantity less than 10 in stock"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   disabled={loading}
@@ -202,7 +228,9 @@ const Dashboard = () => {
                   </div>
                   <div className="kpi-content">
                     <div className="kpi-label">Critical Stock</div>
-                    <div className="kpi-value">0</div>
+                    <div className="kpi-value" style={{ color: lowStockCount > 0 ? "#dc3545" : "#28a745" }}>
+                      {lowStockCount}
+                    </div>
                   </div>
                 </div>
               </div>
