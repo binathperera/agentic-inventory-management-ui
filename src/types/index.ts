@@ -137,6 +137,7 @@ export interface Transaction {
   paidAmount: number;
   balanceAmount: number;
   createdAt: string;
+  items?: TransactionItem[];
 }
 
 export interface TransactionCreateRequest {
