@@ -41,15 +41,20 @@ const InvoiceModal = ({ invoice, suppliers, onSave, onClose }: InvoiceModalProps
     setLoading(true);
 
     try {
-      const invoiceData: InvoiceCreateRequest = {
-        invoiceNo,
-        supplierId,
-        date: new Date(date).toISOString(),
-      };
-
       if (invoice) {
+        const invoiceData = {
+          id: invoice.id,
+          invoiceNo,
+          supplierId,
+          date: new Date(date).toISOString(),
+        };
         await invoiceService.updateInvoice(invoice.invoiceNo, invoiceData);
       } else {
+        const invoiceData: InvoiceCreateRequest = {
+          invoiceNo,
+          supplierId,
+          date: new Date(date).toISOString(),
+        };
         await invoiceService.createInvoice(invoiceData);
       }
       onSave();
@@ -104,7 +109,7 @@ const InvoiceModal = ({ invoice, suppliers, onSave, onClose }: InvoiceModalProps
             >
               <option value="">Select a supplier</option>
               {suppliers.map((supplier) => (
-                <option key={supplier.supplierId} value={supplier.supplierId}>
+                <option key={supplier.id} value={supplier.id}>
                   {supplier.name}
                 </option>
               ))}

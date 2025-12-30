@@ -66,9 +66,9 @@ const SaleModal = ({ transaction, products, onSave, onClose }: SaleModalProps) =
     if (field === 'productId') {
       newItems[index][field] = value as string;
       // Auto-populate unit price from product
-      const product = products.find(p => p.productId === value);
+      const product = products.find(p => p.id === value);
       if (product) {
-        newItems[index].unitPrice = product.price ?? 0;
+        newItems[index].unitPrice = product.latestUnitPrice ?? 0;
       }
     } else {
       newItems[index][field] = value as number;
@@ -132,7 +132,7 @@ const SaleModal = ({ transaction, products, onSave, onClose }: SaleModalProps) =
   };
 
   const getProductName = (productId: string) => {
-    const product = products.find(p => p.productId === productId);
+    const product = products.find(p => p.id === productId);
     return product ? product.name : '';
   };
 
@@ -282,8 +282,8 @@ const SaleModal = ({ transaction, products, onSave, onClose }: SaleModalProps) =
                   >
                     <option value="">Select product</option>
                     {products.map((product) => (
-                      <option key={product.productId} value={product.productId}>
-                        {product.name} (Stock: {product.remainingQty})
+                      <option key={product.id} value={product.id}>
+                        {product.name} (Stock: {product.remainingQuantity})
                       </option>
                     ))}
                   </select>
