@@ -73,7 +73,7 @@ const Dashboard = () => {
                   id="ai-chat-prompt"
                   className="ai-chat-input"
                   rows={3}
-                  placeholder="Example: Show me items with quantity less than 10 in the Colombo warehouse"
+                  placeholder="Example: Show me items with quantity less than 10 in Stock"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   disabled={loading}
