@@ -3,6 +3,7 @@ import { tenantConfigService } from "../services/api";
 import type { TenantConfig } from "../types";
 import Navigation from "../components/Navigation";
 import TenantConfigModal from "../components/TenantConfigModal";
+import { Building2 } from "lucide-react";
 import "../styles/Suppliers.css";
 import "../styles/TenantSettings.css";
 
@@ -286,7 +287,12 @@ const TenantSettings = () => {
           ) : (
             <div className="no-data">
               <div className="no-config-message">
-                <h3>🏢 No Configuration Found</h3>
+                <Building2
+                  size={48}
+                  color="#3b82f6"
+                  style={{ marginBottom: "16px" }}
+                />
+                <h3>No Configuration Found</h3>
                 <p>Your tenant configuration hasn't been set up yet.</p>
                 <p>
                   Click the button below to create a default configuration with

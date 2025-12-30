@@ -20,6 +20,7 @@ import type {
   TransactionCreateRequest,
   TransactionUpdateRequest,
   TenantConfig,
+  AiChatDocument,
 } from "../types";
 
 const API_BASE_URL = "http://localhost:8080/api";
@@ -310,6 +311,16 @@ export const tenantConfigService = {
     const response = await api.get<TenantConfig>(
       `/tenant-config/by-subdomain/${subDomain}`
     );
+    return response.data;
+  },
+};
+
+// AI Chat APIs
+export const aiChatService = {
+  query: async (prompt: string): Promise<AiChatDocument[]> => {
+    const response = await api.get<AiChatDocument[]>("/chat/query", {
+      params: { prompt },
+    });
     return response.data;
   },
 };

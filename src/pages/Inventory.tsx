@@ -5,6 +5,7 @@ import type { Product } from "../types";
 import Navigation from "../components/Navigation";
 import ProductModal from "../components/ProductModal";
 import ProductTable from "../components/ProductTable.tsx";
+import { Package, DollarSign, AlertTriangle } from "lucide-react";
 import "../styles/Dashboard.css";
 
 const Inventory = () => {
@@ -139,21 +140,27 @@ const Inventory = () => {
 
         <div className="stats-container">
           <div className="stat-card">
-            <div className="stat-icon">📦</div>
+            <div className="stat-icon">
+              <Package size={32} color="#3b82f6" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Total Products</div>
               <div className="stat-value">{totalProducts}</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon">
+              <DollarSign size={32} color="#10b981" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Total Inventory Value</div>
               <div className="stat-value">${totalValue.toFixed(2)}</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">⚠️</div>
+            <div className="stat-icon">
+              <AlertTriangle size={32} color="#ef4444" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Low Stock Items</div>
               <div

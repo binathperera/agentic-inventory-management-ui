@@ -136,6 +136,7 @@ export interface Transaction {
   netAmount: number;
   paidAmount: number;
   balanceAmount: number;
+  createdAt: string;
 }
 
 export interface TransactionCreateRequest {
@@ -182,6 +183,16 @@ export interface TenantConfig {
   uiTheme?: UiTheme;
   localization?: Localization;
   features?: Features;
+}
+
+// AI chat document response
+export interface AiChatDocument {
+  id?: string;
+  title?: string;
+  content?: string;
+  score?: number;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface Brand {
