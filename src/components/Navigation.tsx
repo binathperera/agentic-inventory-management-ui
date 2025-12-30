@@ -1,6 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/Navigation.css";
+import {
+  LayoutDashboard,
+  Package,
+  Building2,
+  FileText,
+  Layers,
+  ShoppingCart,
+  Users,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
 const Navigation = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -27,8 +38,8 @@ const Navigation = () => {
             to="/dashboard"
             className={`nav-link ${isActive("/dashboard")}`}
           >
-            <span className="nav-icon">📊</span>
-            Dashboard
+            <LayoutDashboard className="nav-icon" size={20} />
+            <span>Dashboard</span>
           </Link>
         </li>
         <li>
@@ -36,8 +47,8 @@ const Navigation = () => {
             to="/inventory"
             className={`nav-link ${isActive("/inventory")}`}
           >
-            <span className="nav-icon">📦</span>
-            Inventory
+            <Package className="nav-icon" size={20} />
+            <span>Inventory</span>
           </Link>
         </li>
         <li>
@@ -45,34 +56,34 @@ const Navigation = () => {
             to="/suppliers"
             className={`nav-link ${isActive("/suppliers")}`}
           >
-            <span className="nav-icon">🏢</span>
-            Suppliers
+            <Building2 className="nav-icon" size={20} />
+            <span>Suppliers</span>
           </Link>
         </li>
         <li>
           <Link to="/invoices" className={`nav-link ${isActive("/invoices")}`}>
-            <span className="nav-icon">📄</span>
-            Invoices
+            <FileText className="nav-icon" size={20} />
+            <span>Invoices</span>
           </Link>
         </li>
         <li>
           <Link to="/batches" className={`nav-link ${isActive("/batches")}`}>
-            <span className="nav-icon">📋</span>
-            Product Batches
+            <Layers className="nav-icon" size={20} />
+            <span>Product Batches</span>
           </Link>
         </li>
         <li>
           <Link to="/sales" className={`nav-link ${isActive("/sales")}`}>
-            <span className="nav-icon">💰</span>
-            Sales
+            <ShoppingCart className="nav-icon" size={20} />
+            <span>Sales</span>
           </Link>
         </li>
         {isAdmin() && (
           <>
             <li>
               <Link to="/users" className={`nav-link ${isActive("/users")}`}>
-                <span className="nav-icon">👥</span>
-                Users
+                <Users className="nav-icon" size={20} />
+                <span>Users</span>
               </Link>
             </li>
             <li>
@@ -80,8 +91,8 @@ const Navigation = () => {
                 to="/settings"
                 className={`nav-link ${isActive("/settings")}`}
               >
-                <span className="nav-icon">⚙️</span>
-                Settings
+                <Settings className="nav-icon" size={20} />
+                <span>Settings</span>
               </Link>
             </li>
           </>
@@ -89,7 +100,8 @@ const Navigation = () => {
       </ul>
       <div className="nav-footer">
         <button onClick={logout} className="btn-logout">
-          Logout
+          <LogOut size={18} />
+          <span>Logout</span>
         </button>
       </div>
     </nav>

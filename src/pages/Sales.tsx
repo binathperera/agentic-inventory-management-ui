@@ -104,7 +104,7 @@ const Sales = () => {
       <div className="page-content">
         <div className="page-header">
           <h1>Sales Management</h1>
-          <p className="subtitle">Track sales transactions and revenue</p>
+          {/* <p className="subtitle">Track sales transactions and revenue</p> */}
         </div>
 
         {/* Sales Statistics Cards */}

@@ -3,6 +3,7 @@ import { invoiceService, supplierService } from "../services/api";
 import type { Invoice, Supplier } from "../types";
 import Navigation from "../components/Navigation";
 import InvoiceModal from "../components/InvoiceModal";
+import { FileText, Building2, Calendar } from "lucide-react";
 import "../styles/Suppliers.css";
 
 const Invoices = () => {
@@ -97,20 +98,24 @@ const Invoices = () => {
       <div className="page-content">
         <div className="page-header">
           <h1>Invoice Management</h1>
-          <p className="subtitle">Track purchase invoices and orders</p>
+          {/* <p className="subtitle">Track purchase invoices and orders</p> */}
         </div>
 
         {/* Invoice Statistics */}
         <div className="stats-container">
           <div className="stat-card">
-            <div className="stat-icon">📄</div>
+            <div className="stat-icon">
+              <FileText size={32} color="#3b82f6" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Total Invoices</div>
               <div className="stat-value">{invoices.length}</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">🏢</div>
+            <div className="stat-icon">
+              <Building2 size={32} color="#8b5cf6" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Suppliers</div>
               <div className="stat-value">
@@ -119,7 +124,9 @@ const Invoices = () => {
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">📅</div>
+            <div className="stat-icon">
+              <Calendar size={32} color="#10b981" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">This Month</div>
               <div className="stat-value">

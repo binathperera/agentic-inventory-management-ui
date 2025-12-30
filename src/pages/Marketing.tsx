@@ -1,3 +1,4 @@
+import { Package, ShoppingCart, Handshake, TrendingUp } from "lucide-react";
 import "../styles/Marketing.css";
 
 export default function Marketing() {
@@ -11,19 +12,31 @@ export default function Marketing() {
 
         <div className="features">
           <div className="feature">
-            <h3>📦 Inventory Tracking</h3>
+            <div className="feature-icon">
+              <Package size={32} />
+            </div>
+            <h3>Inventory Tracking</h3>
             <p>Real-time tracking of your products and stock levels</p>
           </div>
           <div className="feature">
-            <h3>🛍️ Sales Management</h3>
+            <div className="feature-icon">
+              <ShoppingCart size={32} />
+            </div>
+            <h3>Sales Management</h3>
             <p>Manage sales transactions and maintain accurate records</p>
           </div>
           <div className="feature">
-            <h3>🤝 Supplier Management</h3>
+            <div className="feature-icon">
+              <Handshake size={32} />
+            </div>
+            <h3>Supplier Management</h3>
             <p>Organize supplier information and manage relationships</p>
           </div>
           <div className="feature">
-            <h3>📊 Reporting & Analytics</h3>
+            <div className="feature-icon">
+              <TrendingUp size={32} />
+            </div>
+            <h3>Reporting & Analytics</h3>
             <p>Generate detailed reports and gain business insights</p>
           </div>
         </div>

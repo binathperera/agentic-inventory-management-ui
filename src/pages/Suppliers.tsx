@@ -4,6 +4,7 @@ import type { Supplier } from "../types";
 import Navigation from "../components/Navigation";
 import SupplierModal from "../components/SupplierModal";
 import SupplierTable from "../components/SupplierTable";
+import { Building2, Mail, Phone } from "lucide-react";
 import "../styles/Suppliers.css";
 
 const Suppliers = () => {
@@ -100,14 +101,18 @@ const Suppliers = () => {
         {/* Supplier Statistics */}
         <div className="stats-container">
           <div className="stat-card">
-            <div className="stat-icon">🏢</div>
+            <div className="stat-icon">
+              <Building2 size={32} color="#3b82f6" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Total Suppliers</div>
               <div className="stat-value">{suppliers.length}</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">✉️</div>
+            <div className="stat-icon">
+              <Mail size={32} color="#10b981" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">Verified Contacts</div>
               <div className="stat-value">
@@ -116,7 +121,9 @@ const Suppliers = () => {
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">📞</div>
+            <div className="stat-icon">
+              <Phone size={32} color="#8b5cf6" />
+            </div>
             <div className="stat-content">
               <div className="stat-label">With Phone</div>
               <div className="stat-value">
