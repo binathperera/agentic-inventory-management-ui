@@ -41,8 +41,8 @@ const SupplierModal = ({ supplier, onSave, onClose }: SupplierModalProps) => {
       };
 
       if (supplier) {
-        await supplierService.updateSupplier(supplier.supplierId, {
-          supplierId: supplier.supplierId,
+        await supplierService.updateSupplier(supplier.id, {
+          id: supplier.id,
           ...supplierData,
         });
       } else {

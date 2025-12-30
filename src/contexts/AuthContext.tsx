@@ -1,8 +1,8 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { jwtDecode } from 'jwt-decode';
-import type { User, LoginRequest, SignupRequest } from '../types';
-import { authService } from '../services/api';
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
+import { jwtDecode } from "jwt-decode";
+import type { User, LoginRequest, SignupRequest } from "../types";
+import { authService } from "../services/api";
 
 interface AuthContextType {
   user: User | null;
@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -44,25 +44,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     // Check for existing token on mount
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode<JWTPayload>(token);
-        
+
         // Check if token is expired
         if (decoded.exp * 1000 < Date.now()) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
         } else {
-          const storedUser = localStorage.getItem('user');
+          const storedUser = localStorage.getItem("user");
           if (storedUser) {
             setUser(JSON.parse(storedUser));
           }
         }
       } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        console.error("Error decoding token:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     }
     setLoading(false);
@@ -72,20 +72,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(true);
     try {
       const response = await authService.login(credentials);
-      console.log('Login response:', response);
-      localStorage.setItem('token', response.token);
-      //Convert response to User type
+      console.log("Login response:", response);
+      // Fail fast when backend returns an error without a token
+      if (!response.token) {
+        const message =
+          response.errorMessage || "Invalid username or password.";
+        throw new Error(message);
+      }
+
+      // Convert response to User type
       const user: User = {
         type: response.type,
         username: response.username,
         email: response.email,
         roles: response.roles,
       };
-      localStorage.setItem('user', JSON.stringify(user));
+
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
       return user;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       throw error;
     } finally {
       setLoading(false);
@@ -96,8 +106,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(true);
     try {
       const response = await authService.signup(userData);
-      console.log('Signup response:', response);
-      localStorage.setItem('token', response.token);
+      console.log("Signup response:", response);
+      localStorage.setItem("token", response.token);
       //Convert response to User type
       const user: User = {
         type: response.type,
@@ -105,11 +115,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         email: response.email,
         roles: response.roles,
       };
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
       return user;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       throw error;
     } finally {
       setLoading(false);
@@ -122,11 +132,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const isAdmin = () => {
-    return user?.roles.includes('ADMIN');
+    return user?.roles.includes("ADMIN");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, isAdmin }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, signup, logout, isAdmin }}
+    >
       {children}
     </AuthContext.Provider>
   );
