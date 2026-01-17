@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CreateSaleModal from '../components/CreateSaleModal';
-import { getSalesHistory } from '../services/api';
+import { transactionService } from '../services/api';
 
 const SalesPage: React.FC = () => {
     const [isModalOpen, setModalOpen] = useState(false);
@@ -8,7 +8,7 @@ const SalesPage: React.FC = () => {
 
     const loadSales = async () => {
         try {
-            const data = await getSalesHistory();
+            const data = await transactionService.getAllTransactions();
             setSales(data);
         } catch (error) {
             console.error(error);
@@ -38,13 +38,13 @@ const SalesPage: React.FC = () => {
                     </thead>
                     <tbody>
                         {sales.map((sale) => (
-                            <tr key={sale.id} className="border-b">
+                            <tr key={sale.transactionId || sale.transactionId} className="border-b">
                                 <td className="px-5 py-5 bg-white text-sm">
                                     {sale.createdAt ? new Date(sale.createdAt).toLocaleDateString() : 'Just now'}
                                 </td>
                                 <td className="px-5 py-5 bg-white text-sm">{sale.paymentMethod}</td>
-                                <td className="px-5 py-5 bg-white text-sm font-bold">${sale.totalAmount}</td>
-                                <td className="px-5 py-5 bg-white text-sm text-red-500">${sale.balance}</td>
+                                <td className="px-5 py-5 bg-white text-sm font-bold">${sale.netAmount ?? sale.totalAmount}</td>
+                                <td className="px-5 py-5 bg-white text-sm text-red-500">${sale.balanceAmount ?? sale.balance}</td>
                             </tr>
                         ))}
                     </tbody>
