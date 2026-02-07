@@ -26,6 +26,7 @@ const Navigation = () => {
     <nav className="navigation">
       {/* Header */}
       <div className="nav-header">
+      
         <Logo />
 
         <div className="user-info-nav">
