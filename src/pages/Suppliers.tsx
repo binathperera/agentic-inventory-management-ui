@@ -93,9 +93,6 @@ const Suppliers = () => {
       <div className="page-content">
         <div className="page-header">
           <h1>Supplier Management</h1>
-          <p className="subtitle">
-            Manage your suppliers and their information
-          </p>
         </div>
 
         {/* Supplier Statistics */}
@@ -116,7 +113,7 @@ const Suppliers = () => {
             <div className="stat-content">
               <div className="stat-label">Verified Contacts</div>
               <div className="stat-value">
-                {suppliers.filter((s) => s.email).length}
+                          {suppliers.filter((s) => s.email).length}
               </div>
             </div>
           </div>

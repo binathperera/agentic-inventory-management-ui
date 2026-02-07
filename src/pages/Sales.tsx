@@ -126,14 +126,14 @@ const Sales = () => {
           <div className="stat-card">
             <div className="stat-icon">✅</div>
             <div className="stat-content">
-              <div className="stat-label">Total Paid</div>
+              <div className="stat-label">Total Received</div>
               <div className="stat-value">${totalPaid.toFixed(2)}</div>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">⏳</div>
             <div className="stat-content">
-              <div className="stat-label">Pending Amount</div>
+              <div className="stat-label">Pending</div>
               <div
                 className="stat-value"
                 style={{ color: totalPending > 0 ? "#ff9800" : "#28a745" }}

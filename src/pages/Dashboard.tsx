@@ -143,10 +143,10 @@ const Dashboard = () => {
 
               {lastPrompt && (
                 <div className="ai-chat-results">
-                  <div className="ai-chat-prompt">You asked: {lastPrompt}</div>
+                  <div className="ai-chat-prompt">Your query: {lastPrompt}</div>
 
                   {loading && (
-                    <div className="ai-chat-loading">Fetching answer...</div>
+                    <div className="ai-chat-loading">Fetching the answer...</div>
                   )}
 
                   {!loading && results.length === 0 && !error && (
