@@ -14,11 +14,20 @@ import {
 } from "lucide-react";
 
 const Navigation = () => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, hasRole } = useAuth();
   const location = useLocation();
 
   const isActive = (path: string) => {
     return location.pathname === path ? "active" : "";
+  };
+
+  const getRoleName = () => {
+    if (!user?.roles || user.roles.length === 0) return 'User';
+    const firstRole = user.roles[0];
+    if (typeof firstRole === 'string') {
+      return firstRole;
+    }
+    return (firstRole as any).name || 'User';
   };
 
   return (
@@ -28,7 +37,7 @@ const Navigation = () => {
         <div className="user-info-nav">
           <span className="user-name-nav">{user?.username}</span>
           <span className="user-role-nav">
-            {user?.roles[1] ? user.roles[1] : user?.roles[0]}
+            {getRoleName()}
           </span>
         </div>
       </div>
@@ -42,42 +51,48 @@ const Navigation = () => {
             <span>Dashboard</span>
           </Link>
         </li>
-        <li>
-          <Link
-            to="/inventory"
-            className={`nav-link ${isActive("/inventory")}`}
-          >
-            <Package className="nav-icon" size={20} />
-            <span>Inventory</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/suppliers"
-            className={`nav-link ${isActive("/suppliers")}`}
-          >
-            <Building2 className="nav-icon" size={20} />
-            <span>Suppliers</span>
-          </Link>
-        </li>
-        <li>
-          <Link to="/invoices" className={`nav-link ${isActive("/invoices")}`}>
-            <FileText className="nav-icon" size={20} />
-            <span>Invoices</span>
-          </Link>
-        </li>
-        <li>
-          <Link to="/batches" className={`nav-link ${isActive("/batches")}`}>
-            <Layers className="nav-icon" size={20} />
-            <span>Product Batches</span>
-          </Link>
-        </li>
-        <li>
-          <Link to="/sales" className={`nav-link ${isActive("/sales")}`}>
-            <ShoppingCart className="nav-icon" size={20} />
-            <span>Sales</span>
-          </Link>
-        </li>
+        {(isAdmin() || hasRole('MANAGER')) && (
+          <>
+            <li>
+              <Link
+                to="/inventory"
+                className={`nav-link ${isActive("/inventory")}`}
+              >
+                <Package className="nav-icon" size={20} />
+                <span>Inventory</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/suppliers"
+                className={`nav-link ${isActive("/suppliers")}`}
+              >
+                <Building2 className="nav-icon" size={20} />
+                <span>Suppliers</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/invoices" className={`nav-link ${isActive("/invoices")}`}>
+                <FileText className="nav-icon" size={20} />
+                <span>Invoices</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/batches" className={`nav-link ${isActive("/batches")}`}>
+                <Layers className="nav-icon" size={20} />
+                <span>Product Batches</span>
+              </Link>
+            </li>
+          </>
+        )}
+        {(isAdmin() || hasRole('MANAGER') || hasRole('CASHIER')) && (
+          <li>
+            <Link to="/sales" className={`nav-link ${isActive("/sales")}`}>
+              <ShoppingCart className="nav-icon" size={20} />
+              <span>Sales</span>
+            </Link>
+          </li>
+        )}
         {isAdmin() && (
           <>
             <li>

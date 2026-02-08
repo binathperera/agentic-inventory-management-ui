@@ -7,6 +7,7 @@ import type {
   ProductCreateRequest,
   ProductUpdateRequest,
   User,
+  Role,
   Supplier,
   SupplierCreateRequest,
   SupplierUpdateRequest,
@@ -130,18 +131,56 @@ export const userService = {
     return response.data;
   },
 
-  getUserById: async (id: number): Promise<User> => {
+  getUserById: async (id: string): Promise<User> => {
     const response = await api.get<User>(`/users/${id}`);
     return response.data;
   },
 
-  updateUser: async (id: number, user: Partial<User>): Promise<User> => {
+  updateUser: async (id: string, user: Partial<User>): Promise<User> => {
     const response = await api.put<User>(`/users/${id}`, user);
     return response.data;
   },
 
-  deleteUser: async (username: string): Promise<void> => {
-    await api.delete(`/users/${username}`);
+  updateUserRoles: async (id: string, roles: any[]): Promise<User> => {
+    const response = await api.put<User>(`/users/${id}`, { roles });
+    return response.data;
+  },
+
+  assignRole: async (userId: string, roleId: string): Promise<User> => {
+    const response = await api.post<User>(`/users/${userId}/roles/${roleId}`, {});
+    return response.data;
+  },
+
+  removeRole: async (userId: string, roleId: string): Promise<User> => {
+    const response = await api.delete<User>(`/users/${userId}/roles/${roleId}`);
+    return response.data;
+  },
+
+  enableUser: async (id: string): Promise<User> => {
+    const response = await api.put<User>(`/users/${id}`, { enabled: true });
+    return response.data;
+  },
+
+  disableUser: async (id: string): Promise<User> => {
+    const response = await api.put<User>(`/users/${id}`, { enabled: false });
+    return response.data;
+  },
+
+  deleteUser: async (id: string): Promise<void> => {
+    await api.delete(`/users/${id}`);
+  },
+};
+
+// Role APIs
+export const roleService = {
+  getAllRoles: async (): Promise<Role[]> => {
+    const response = await api.get<Role[]>("/roles");
+    return response.data;
+  },
+
+  getRoleById: async (id: string): Promise<Role> => {
+    const response = await api.get<Role>(`/roles/${id}`);
+    return response.data;
   },
 };
 

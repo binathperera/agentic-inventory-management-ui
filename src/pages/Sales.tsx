@@ -181,7 +181,7 @@ const Sales = () => {
             </div>
 
             <button onClick={handleCreateSale} className="btn btn-primary">
-              + Create Sale
+              + Add Transaction
             </button>
           </div>
 
@@ -193,7 +193,7 @@ const Sales = () => {
             <div className="no-data">
               <p>No sales transactions found</p>
               <button onClick={handleCreateSale} className="btn btn-primary">
-                Create First Sale
+                Add first transaction
               </button>
             </div>
           ) : (

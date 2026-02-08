@@ -43,7 +43,7 @@ function App() {
               <Route
                 path="/inventory"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <Inventory />
                   </ProtectedRoute>
                 }
@@ -51,7 +51,7 @@ function App() {
               <Route
                 path="/suppliers"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <Suppliers />
                   </ProtectedRoute>
                 }
@@ -59,7 +59,7 @@ function App() {
               <Route
                 path="/invoices"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <Invoices />
                   </ProtectedRoute>
                 }
@@ -67,7 +67,7 @@ function App() {
               <Route
                 path="/batches"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <ProductBatches />
                   </ProtectedRoute>
                 }
@@ -75,7 +75,7 @@ function App() {
               <Route
                 path="/sales"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER', 'CASHIER']} requireAnyRole>
                     <Sales />
                   </ProtectedRoute>
                 }
