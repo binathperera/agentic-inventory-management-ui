@@ -4,6 +4,11 @@ import type { Transaction, Product } from "../types";
 import Navigation from "../components/Navigation";
 import SaleModal from "../components/SaleModal";
 import "../styles/Suppliers.css";
+import type { AxiosError } from "axios";
+
+interface ErrorResponse {
+  message?: string;
+}
 
 const Sales = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -32,8 +37,31 @@ const Sales = () => {
       setProducts(productsData);
       setError("");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load data";
+      let message = "Failed to load transactions";
+      if (err instanceof Error) {
+        message = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        const axiosError = err as AxiosError<ErrorResponse>;
+        if (axiosError.code === "ERR_NETWORK" && !axiosError.response) {
+          message = "CORS Error: Cannot connect to backend API. Please ensure the backend is running and the dev server has been restarted.";
+        } else if (axiosError.response?.status === 400) {
+          const backendMsg = (axiosError.response?.data as ErrorResponse)?.message;
+          message = backendMsg ? `Error: ${backendMsg}` : "Bad Request (400): Invalid request to server";
+        } else if (axiosError.response?.status === 403) {
+          message = "Access denied: You don't have permission to view transactions";
+        } else if (axiosError.response?.status === 401) {
+          message = "Authentication failed: Please log in again";
+        } else if (axiosError.response?.status === 500) {
+          message = "Server error: Please try again later";
+        } else if ((axiosError.response?.data as ErrorResponse)?.message) {
+          message = (axiosError.response?.data as ErrorResponse)?.message ?? "An error occurred";
+        } else if (axiosError.message === "Network Error") {
+          message = "Network error: Unable to connect to the server";
+        }
+      }
+      const axiosErr = err as AxiosError<ErrorResponse>;
+      console.error("[Sales] Load error - Status:", axiosErr?.response?.status, "Message:", axiosErr?.response?.data?.message);
+      console.error("[Sales] Full error:", err);
       setError(message);
     } finally {
       setLoading(false);

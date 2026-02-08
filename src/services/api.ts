@@ -24,7 +24,7 @@ import type {
   AiChatDocument,
 } from "../types";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -40,6 +40,20 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log("[API] Token found, Authorization header set");
+      try {
+        // Decode and log token payload for debugging
+        const base64Url = token.split('.')[1];
+        if (base64Url) {
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          const decoded = JSON.parse(jsonPayload);
+          console.log("[API] Token payload - Roles:", decoded.roles, "TenantId:", decoded.tenantId, "Username:", decoded.username);
+        }
+      } catch {
+        console.log("[API] Could not decode token for debugging");
+      }
     } else {
       console.log("[API] No token found in localStorage");
     }
@@ -61,14 +75,16 @@ api.interceptors.response.use(
     }
 
     // Log all errors for debugging
-    if (error.response?.status === 400 || error.response?.status === 403) {
-      console.error(`[API] ${error.response?.status} Error:`);
-      console.error("  URL:", error.config?.url);
-      console.error("  Method:", error.config?.method);
-      console.error("  Response Data:", error.response?.data);
-      console.error("  Auth Header:", error.config?.headers?.Authorization);
-      console.error("  Status:", error.response?.status);
-      console.error("  Status Text:", error.response?.statusText);
+    console.error("[API] Error occurred:");
+    console.error("  URL:", error.config?.url);
+    console.error("  Method:", error.config?.method);
+    console.error("  Status:", error.response?.status);
+    console.error("  Status Text:", error.response?.statusText);
+    console.error("  Response Data:", error.response?.data);
+    console.error("  Auth Header:", error.config?.headers?.Authorization);
+    console.error("  Error Message:", error.message);
+    if (error.request && !error.response) {
+      console.error("  Network Error - No response received");
     }
 
     return Promise.reject(error);
@@ -141,7 +157,7 @@ export const userService = {
     return response.data;
   },
 
-  updateUserRoles: async (id: string, roles: any[]): Promise<User> => {
+  updateUserRoles: async (id: string, roles: Role[]): Promise<User> => {
     const response = await api.put<User>(`/users/${id}`, { roles });
     return response.data;
   },
@@ -187,8 +203,15 @@ export const roleService = {
 // Supplier APIs
 export const supplierService = {
   getAllSuppliers: async (): Promise<Supplier[]> => {
-    const response = await api.get<Supplier[]>("/suppliers");
-    return response.data;
+    try {
+      console.log("[SupplierService] Fetching all suppliers...");
+      const response = await api.get<Supplier[]>("/suppliers");
+      console.log("[SupplierService] Successfully fetched suppliers:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[SupplierService] Error fetching suppliers:", error);
+      throw error;
+    }
   },
 
   getSupplierById: async (id: string): Promise<Supplier> => {
@@ -219,8 +242,15 @@ export const supplierService = {
 // Invoice APIs
 export const invoiceService = {
   getAllInvoices: async (): Promise<Invoice[]> => {
-    const response = await api.get<Invoice[]>("/invoices");
-    return response.data;
+    try {
+      console.log("[InvoiceService] Fetching all invoices...");
+      const response = await api.get<Invoice[]>("/invoices");
+      console.log("[InvoiceService] Successfully fetched invoices:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[InvoiceService] Error fetching invoices:", error);
+      throw error;
+    }
   },
 
   getInvoiceById: async (id: string): Promise<Invoice> => {
@@ -297,8 +327,15 @@ export const productBatchService = {
 // Transaction APIs
 export const transactionService = {
   getAllTransactions: async (): Promise<Transaction[]> => {
-    const response = await api.get<Transaction[]>("/transactions");
-    return response.data;
+    try {
+      console.log("[TransactionService] Fetching all transactions...");
+      const response = await api.get<Transaction[]>("/transactions");
+      console.log("[TransactionService] Successfully fetched transactions:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[TransactionService] Error fetching transactions:", error);
+      throw error;
+    }
   },
 
   getTransactionById: async (id: string): Promise<Transaction> => {

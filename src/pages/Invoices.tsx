@@ -32,8 +32,27 @@ const Invoices = () => {
       setSuppliers(suppliersData);
       setError("");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load data";
+      let message = "Failed to load data";
+      if (err instanceof Error) {
+        message = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        const axiosError = err as { code?: string; response?: { status: number; data?: { message: string } }; message?: string };
+        // Check for CORS error first (ERR_NETWORK with no response)
+        if (axiosError.code === "ERR_NETWORK" && !axiosError.response) {
+          message = "CORS Error: Cannot connect to backend API. Please ensure:\n1. Backend API is running at http://localhost:8080\n2. The frontend dev server has been restarted to apply CORS proxy settings\n3. Browser console shows CORS error details";
+        } else if (axiosError.response?.status === 403) {
+          message = "Access denied: You don't have permission to view invoices";
+        } else if (axiosError.response?.status === 401) {
+          message = "Authentication failed: Please log in again";
+        } else if (axiosError.response?.status === 500) {
+          message = "Server error: Please try again later";
+        } else if (axiosError.response?.data?.message) {
+          message = axiosError.response.data.message;
+        } else if (axiosError.message === "Network Error") {
+          message = "Network error: Unable to connect to the server. Please check your connection and ensure the backend API is running.";
+        }
+      }
+      console.error("[Invoices] Load error:", err);
       setError(message);
     } finally {
       setLoading(false);
