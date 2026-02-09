@@ -84,7 +84,7 @@ const Inventory = () => {
         await productService.updateProduct(editingProduct.id, updatePayload);
       } else {
         if (!productData.id) {
-          throw new Error("Product ID is required to create a product");
+          throw new Error("Product ID is needed for new products");
         }
         const createPayload = {
           id: productData.id,
@@ -135,7 +135,6 @@ const Inventory = () => {
       <div className="page-content">
         <div className="page-header">
           <h1>Inventory Management</h1>
-          <p className="subtitle">Track and manage your product inventory</p>
         </div>
 
         <div className="stats-container">

@@ -1,8 +1,18 @@
+export interface Role {
+  id: string;
+  name: string; // "ADMIN", "CASHIER", "MANAGER"
+}
+
 export interface User {
-  type: string;
+  id?: string;
+  type?: string;
+  tenantId?: string;
   username: string;
   email: string;
-  roles: string[];
+  roles: (Role | string)[]; // Support both Role objects and string names
+  enabled?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   errorMessage?: string;
 }
 
@@ -19,11 +29,19 @@ export interface SignupRequest {
 
 export interface AuthResponse {
   token: string;
-  type: string;
+  type?: string;
   username: string;
   email: string;
-  roles: string[];
+  roles: (Role | string)[];
+  tenantId?: string;
   errorMessage?: string;
+}
+
+export interface UserUpdateRequest {
+  username?: string;
+  email?: string;
+  roles?: Role[];
+  enabled?: boolean;
 }
 
 // Product types matching new schema

@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+
 import { AuthProvider } from "./contexts/AuthContext";
 import { TenantProvider } from "./contexts/TenantContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -42,7 +43,7 @@ function App() {
               <Route
                 path="/inventory"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <Inventory />
                   </ProtectedRoute>
                 }
@@ -50,7 +51,7 @@ function App() {
               <Route
                 path="/suppliers"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <Suppliers />
                   </ProtectedRoute>
                 }
@@ -58,7 +59,7 @@ function App() {
               <Route
                 path="/invoices"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <Invoices />
                   </ProtectedRoute>
                 }
@@ -66,7 +67,7 @@ function App() {
               <Route
                 path="/batches"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER']} requireAnyRole>
                     <ProductBatches />
                   </ProtectedRoute>
                 }
@@ -74,7 +75,7 @@ function App() {
               <Route
                 path="/sales"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRoles={['ADMIN', 'MANAGER', 'CASHIER']} requireAnyRole>
                     <Sales />
                   </ProtectedRoute>
                 }

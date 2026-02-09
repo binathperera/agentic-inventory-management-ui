@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import type {
   TenantConfig,
   Brand,
-  UiTheme,
-  Localization,
-  Features,
+  UiTheme
 } from "../types";
 import "../styles/Modal.css";
 
@@ -26,12 +24,11 @@ const TenantConfigModal = ({
   const [formData, setFormData] = useState<TenantConfig>({
     brand: {},
     uiTheme: {},
-    localization: {},
-    features: {},
+  
   });
 
   const [activeTab, setActiveTab] = useState<
-    "brand" | "theme" | "localization" | "features"
+    "brand" | "theme" 
   >("brand");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -41,9 +38,7 @@ const TenantConfigModal = ({
       setFormData({
         ...config,
         brand: config.brand || {},
-        uiTheme: config.uiTheme || {},
-        localization: config.localization || {},
-        features: config.features || {},
+        uiTheme: config.uiTheme || {}
       });
       setActiveTab("brand");
     }
@@ -69,28 +64,7 @@ const TenantConfigModal = ({
     }));
   };
 
-  const handleLocalizationChange = (
-    field: keyof Localization,
-    value: string
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      localization: {
-        ...prev.localization,
-        [field]: value,
-      },
-    }));
-  };
-
-  const handleFeaturesChange = (field: keyof Features, value: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: {
-        ...prev.features,
-        [field]: value,
-      },
-    }));
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,22 +116,6 @@ const TenantConfigModal = ({
           >
             Theme
           </button>
-          <button
-            className={`tab-button ${
-              activeTab === "localization" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("localization")}
-            disabled={submitting || loading}
-          >
-            Localization
-          </button>
-          <button
-            className={`tab-button ${activeTab === "features" ? "active" : ""}`}
-            onClick={() => setActiveTab("features")}
-            disabled={submitting || loading}
-          >
-            Features
-          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -173,46 +131,6 @@ const TenantConfigModal = ({
                   onChange={(e) => handleBrandChange("name", e.target.value)}
                   disabled={submitting || loading}
                   placeholder="Enter brand name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="logo-url">Logo URL</label>
-                <input
-                  id="logo-url"
-                  type="text"
-                  value={formData.brand?.logoUrl || ""}
-                  onChange={(e) => handleBrandChange("logoUrl", e.target.value)}
-                  disabled={submitting || loading}
-                  placeholder="Enter logo URL"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="favicon-url">Favicon URL</label>
-                <input
-                  id="favicon-url"
-                  type="text"
-                  value={formData.brand?.faviconUrl || ""}
-                  onChange={(e) =>
-                    handleBrandChange("faviconUrl", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="Enter favicon URL"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="banner-url">Banner URL</label>
-                <input
-                  id="banner-url"
-                  type="text"
-                  value={formData.brand?.bannerUrl || ""}
-                  onChange={(e) =>
-                    handleBrandChange("bannerUrl", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="Enter banner URL"
                 />
               </div>
 
@@ -268,16 +186,28 @@ const TenantConfigModal = ({
 
               <div className="form-group">
                 <label htmlFor="font-family">Font Family</label>
-                <input
-                  id="font-family"
-                  type="text"
-                  value={formData.brand?.fontFamily || ""}
-                  onChange={(e) =>
-                    handleBrandChange("fontFamily", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="e.g., Roboto, sans-serif"
-                />
+                <select
+  id="font-family"
+  value={formData.brand?.fontFamily || "Inter, sans-serif"}
+  onChange={(e) =>
+    handleBrandChange("fontFamily", e.target.value)
+  }
+  disabled={submitting || loading}
+>
+  <option value="Inter, sans-serif">Inter</option>
+  <option value="Roboto, sans-serif">Roboto</option>
+  <option value="Poppins, sans-serif">Poppins</option>
+  <option value="Montserrat, sans-serif">Montserrat</option>
+  <option value="Open Sans, sans-serif">Open Sans</option>
+  <option value="Lato, sans-serif">Lato</option>
+  <option value="Nunito, sans-serif">Nunito</option>
+  <option value="Work Sans, sans-serif">Work Sans</option>
+  <option value="Source Sans Pro, sans-serif">Source Sans Pro</option>
+  <option value="DM Sans, sans-serif">DM Sans</option>
+  <option value="Manrope, sans-serif">Manrope</option>
+  <option value="Public Sans, sans-serif">Public Sans</option>
+</select>
+
               </div>
             </div>
           )}
@@ -357,136 +287,7 @@ const TenantConfigModal = ({
             </div>
           )}
 
-          {/* Localization Tab */}
-          {activeTab === "localization" && (
-            <div className="form-section">
-              <div className="form-group">
-                <label htmlFor="language">Language</label>
-                <input
-                  id="language"
-                  type="text"
-                  value={formData.localization?.language || ""}
-                  onChange={(e) =>
-                    handleLocalizationChange("language", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="e.g., en, es, fr"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="timezone">Timezone</label>
-                <input
-                  id="timezone"
-                  type="text"
-                  value={formData.localization?.timezone || ""}
-                  onChange={(e) =>
-                    handleLocalizationChange("timezone", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="e.g., America/New_York, UTC"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="currency">Currency</label>
-                <input
-                  id="currency"
-                  type="text"
-                  value={formData.localization?.currency || ""}
-                  onChange={(e) =>
-                    handleLocalizationChange("currency", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="e.g., USD, EUR, GBP"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="date-format">Date Format</label>
-                <input
-                  id="date-format"
-                  type="text"
-                  value={formData.localization?.dateFormat || ""}
-                  onChange={(e) =>
-                    handleLocalizationChange("dateFormat", e.target.value)
-                  }
-                  disabled={submitting || loading}
-                  placeholder="e.g., MM/DD/YYYY, DD/MM/YYYY"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Features Tab */}
-          {activeTab === "features" && (
-            <div className="form-section">
-              <div className="form-group checkbox-group">
-                <label htmlFor="inventory-module">
-                  <input
-                    id="inventory-module"
-                    type="checkbox"
-                    checked={formData.features?.inventoryModule || false}
-                    onChange={(e) =>
-                      handleFeaturesChange("inventoryModule", e.target.checked)
-                    }
-                    disabled={submitting || loading}
-                  />
-                  <span>Inventory Module</span>
-                </label>
-              </div>
-
-              <div className="form-group checkbox-group">
-                <label htmlFor="reporting-module">
-                  <input
-                    id="reporting-module"
-                    type="checkbox"
-                    checked={formData.features?.reportingModule || false}
-                    onChange={(e) =>
-                      handleFeaturesChange("reportingModule", e.target.checked)
-                    }
-                    disabled={submitting || loading}
-                  />
-                  <span>Reporting Module</span>
-                </label>
-              </div>
-
-              <div className="form-group checkbox-group">
-                <label htmlFor="supplier-management">
-                  <input
-                    id="supplier-management"
-                    type="checkbox"
-                    checked={formData.features?.supplierManagement || false}
-                    onChange={(e) =>
-                      handleFeaturesChange(
-                        "supplierManagement",
-                        e.target.checked
-                      )
-                    }
-                    disabled={submitting || loading}
-                  />
-                  <span>Supplier Management</span>
-                </label>
-              </div>
-
-              <div className="form-group checkbox-group">
-                <label htmlFor="advanced-pricing">
-                  <input
-                    id="advanced-pricing"
-                    type="checkbox"
-                    checked={formData.features?.advancedPricing || false}
-                    onChange={(e) =>
-                      handleFeaturesChange("advancedPricing", e.target.checked)
-                    }
-                    disabled={submitting || loading}
-                  />
-                  <span>Advanced Pricing</span>
-                </label>
-              </div>
-            </div>
-          )}
-
-          <div className="modal-footer">
+            <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}

@@ -8,5 +8,12 @@ export default defineConfig({
     strictPort: true,
     host: true, // Listen on all addresses
     allowedHosts: [".localhost"], // Allow any subdomain of localhost
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path, // Keep the /api path as is
+      },
+    },
   },
 });

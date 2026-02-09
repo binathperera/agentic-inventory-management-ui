@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { transactionService, productService } from "../services/api";
 import type { Transaction, Product } from "../types";
 import Navigation from "../components/Navigation";
 import SaleModal from "../components/SaleModal";
 import "../styles/Suppliers.css";
+import type { AxiosError } from "axios";
+
+interface ErrorResponse {
+  message?: string;
+}
 
 const Sales = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -11,8 +16,7 @@ const Sales = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [viewingTransaction, setViewingTransaction] =
-    useState<Transaction | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPaymentMethod, setFilterPaymentMethod] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
@@ -32,8 +36,31 @@ const Sales = () => {
       setProducts(productsData);
       setError("");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load data";
+      let message = "Failed to load transactions";
+      if (err instanceof Error) {
+        message = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        const axiosError = err as AxiosError<ErrorResponse>;
+        if (axiosError.code === "ERR_NETWORK" && !axiosError.response) {
+          message = "CORS Error: Cannot connect to backend API. Please ensure the backend is running and the dev server has been restarted.";
+        } else if (axiosError.response?.status === 400) {
+          const backendMsg = (axiosError.response?.data as ErrorResponse)?.message;
+          message = backendMsg ? `Error: ${backendMsg}` : "Bad Request (400): Invalid request to server";
+        } else if (axiosError.response?.status === 403) {
+          message = "Access denied: You don't have permission to view transactions";
+        } else if (axiosError.response?.status === 401) {
+          message = "Authentication failed: Please log in again";
+        } else if (axiosError.response?.status === 500) {
+          message = "Server error: Please try again later";
+        } else if ((axiosError.response?.data as ErrorResponse)?.message) {
+          message = (axiosError.response?.data as ErrorResponse)?.message ?? "An error occurred";
+        } else if (axiosError.message === "Network Error") {
+          message = "Network error: Unable to connect to the server";
+        }
+      }
+      const axiosErr = err as AxiosError<ErrorResponse>;
+      console.error("[Sales] Load error - Status:", axiosErr?.response?.status, "Message:", axiosErr?.response?.data?.message);
+      console.error("[Sales] Full error:", err);
       setError(message);
     } finally {
       setLoading(false);
@@ -65,37 +92,47 @@ const Sales = () => {
     }
   };
 
-  const filteredTransactions = transactions.filter((transaction) => {
-    const matchesSearch =
-      transaction.transactionId
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      transaction.paymentMethod
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesPayment =
-      filterPaymentMethod === "all" ||
-      transaction.paymentMethod === filterPaymentMethod;
-    return matchesSearch && matchesPayment;
-  });
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((transaction) => {
+      if (!transaction || !transaction.transactionId) return false;
+      
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = 
+        transaction.transactionId.toLowerCase().includes(searchLower) ||
+        (transaction.paymentMethod?.toLowerCase()?.includes(searchLower) ?? false);
+      
+      const matchesPayment =
+        filterPaymentMethod === "all" ||
+        transaction.paymentMethod === filterPaymentMethod;
+        
+      return matchesSearch && matchesPayment;
+    });
+  }, [transactions, searchTerm, filterPaymentMethod]);
 
-  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
-    if (sortBy === "recent")
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    if (sortBy === "amount") return b.netAmount - a.netAmount;
-    return 0;
-  });
+  const sortedTransactions = useMemo(() => {
+    return [...filteredTransactions].sort((a, b) => {
+      if (sortBy === "recent")
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === "amount") return b.netAmount - a.netAmount;
+      return 0;
+    });
+  }, [filteredTransactions, sortBy]);
 
   // Calculate sales statistics
-  const totalSales = transactions.length;
-  const totalRevenue = transactions.reduce((sum, t) => sum + t.netAmount, 0);
-  const totalPaid = transactions.reduce((sum, t) => sum + t.paidAmount, 0);
-  const totalPending = transactions.reduce(
-    (sum, t) => sum + t.balanceAmount,
-    0
-  );
+  const totalSales = transactions.filter(t => t && t.id).length;
+  const totalRevenue = transactions.reduce((sum, t) => 
+    t?.netAmount ? sum + t.netAmount : sum, 0);
+  const totalPaid = transactions.reduce((sum, t) => 
+    t?.paidAmount ? sum + t.paidAmount : sum, 0);
+  const totalPending = transactions.reduce((sum, t) => 
+    t?.balanceAmount ? sum + t.balanceAmount : sum, 0);
+  
   const paymentMethods = [
-    ...new Set(transactions.map((t) => t.paymentMethod).filter(Boolean)),
+    ...new Set(
+      transactions
+        .filter(t => t?.paymentMethod)
+        .map((t) => t.paymentMethod)
+    ),
   ];
 
   return (
@@ -104,7 +141,6 @@ const Sales = () => {
       <div className="page-content">
         <div className="page-header">
           <h1>Sales Management</h1>
-          {/* <p className="subtitle">Track sales transactions and revenue</p> */}
         </div>
 
         {/* Sales Statistics Cards */}
@@ -126,14 +162,14 @@ const Sales = () => {
           <div className="stat-card">
             <div className="stat-icon">✅</div>
             <div className="stat-content">
-              <div className="stat-label">Total Paid</div>
+              <div className="stat-label">Total Received</div>
               <div className="stat-value">${totalPaid.toFixed(2)}</div>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">⏳</div>
             <div className="stat-content">
-              <div className="stat-label">Pending Amount</div>
+              <div className="stat-label">Pending</div>
               <div
                 className="stat-value"
                 style={{ color: totalPending > 0 ? "#ff9800" : "#28a745" }}
@@ -181,7 +217,7 @@ const Sales = () => {
             </div>
 
             <button onClick={handleCreateSale} className="btn btn-primary">
-              + Create Sale
+              + Add Transaction
             </button>
           </div>
 
@@ -193,7 +229,7 @@ const Sales = () => {
             <div className="no-data">
               <p>No sales transactions found</p>
               <button onClick={handleCreateSale} className="btn btn-primary">
-                Create First Sale
+                Add first transaction
               </button>
             </div>
           ) : (
@@ -214,14 +250,14 @@ const Sales = () => {
                 </thead>
                 <tbody>
                   {sortedTransactions.map((transaction) => (
-                    <tr key={transaction.transactionId}>
+                    <tr key={transaction.id || transaction.transactionId}>
                       <td>{transaction.transactionId}</td>
                       <td>{transaction.paymentMethod}</td>
-                      <td>${transaction.grossAmount.toFixed(2)}</td>
-                      <td>${transaction.discountAmount.toFixed(2)}</td>
-                      <td>${transaction.netAmount.toFixed(2)}</td>
-                      <td>${transaction.paidAmount.toFixed(2)}</td>
-                      <td>${transaction.balanceAmount.toFixed(2)}</td>
+                      <td>${(transaction.grossAmount || 0).toFixed(2)}</td>
+                      <td>${(transaction.discountAmount || 0).toFixed(2)}</td>
+                      <td>${(transaction.netAmount || 0).toFixed(2)}</td>
+                      <td>${(transaction.paidAmount || 0).toFixed(2)}</td>
+                      <td>${(transaction.balanceAmount || 0).toFixed(2)}</td>
                       <td>
                         {new Date(transaction.createdAt).toLocaleDateString()}
                       </td>
@@ -235,7 +271,7 @@ const Sales = () => {
                           </button>
                           <button
                             onClick={() =>
-                              handleDeleteTransaction(transaction.transactionId)
+                              handleDeleteTransaction(transaction.id || transaction.transactionId!)
                             }
                             className="btn btn-small btn-danger"
                           >

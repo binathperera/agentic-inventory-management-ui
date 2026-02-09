@@ -6,9 +6,12 @@ import TenantConfigModal from "../components/TenantConfigModal";
 import { Building2 } from "lucide-react";
 import "../styles/Suppliers.css";
 import "../styles/TenantSettings.css";
+import { useTenant } from "../contexts/TenantContext";
 
 const TenantSettings = () => {
-  const [config, setConfig] = useState<TenantConfig | null>(null);
+  const { setConfig: setGlobalConfig } = useTenant();
+
+  const [config, setLocalConfig] = useState<TenantConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -22,18 +25,19 @@ const TenantSettings = () => {
     try {
       setLoading(true);
       const data = await tenantConfigService.getTenantConfig();
-      setConfig(data);
+      setLocalConfig(data);
+      setGlobalConfig(data); // sync globally
       setError("");
-    } catch (err: unknown) {
-      // Handle 400 or 404 as config not found - this is expected for new tenants
-      const error = err as { response?: { status?: number } };
-      if (error.response?.status === 400 || error.response?.status === 404) {
-        setConfig(null);
+    } catch (err: any) {
+      if (err?.response?.status === 400 || err?.response?.status === 404) {
+        setLocalConfig(null);
         setError("");
       } else {
-        const message =
-          err instanceof Error ? err.message : "Failed to load configuration";
-        setError(message);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load configuration"
+        );
       }
     } finally {
       setLoading(false);
@@ -46,10 +50,12 @@ const TenantSettings = () => {
 
   const handleUpdateConfig = async (updatedConfig: TenantConfig) => {
     try {
-      const result = await tenantConfigService.updateTenantConfig(
-        updatedConfig
-      );
-      setConfig(result);
+      const result =
+        await tenantConfigService.updateTenantConfig(updatedConfig);
+
+      setLocalConfig(result);
+      setGlobalConfig(result); // 🔥 update entire system instantly
+
       setSuccessMessage("Configuration updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
       setError("");
@@ -64,7 +70,7 @@ const TenantSettings = () => {
   const handleInitializeConfig = async () => {
     if (
       !window.confirm(
-        "Are you sure you want to initialize the default configuration? This may overwrite existing settings."
+        "Are you sure you want to initialize default configuration?"
       )
     ) {
       return;
@@ -72,22 +78,21 @@ const TenantSettings = () => {
 
     try {
       setLoading(true);
-      const result = await tenantConfigService.initializeTenantConfig();
-      setConfig(result);
+      const result =
+        await tenantConfigService.initializeTenantConfig();
+
+      setLocalConfig(result);
+      setGlobalConfig(result); // 🔥 sync globally
+
       setSuccessMessage("Configuration initialized successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
       setError("");
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      let message = "Failed to initialize configuration";
-
-      if (error.response?.data?.message) {
-        message = error.response.data.message;
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
-
-      setError(message);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to initialize configuration"
+      );
     } finally {
       setLoading(false);
     }
@@ -96,9 +101,10 @@ const TenantSettings = () => {
   return (
     <div className="page-with-nav">
       <Navigation />
+
       <div className="page-content">
         <div className="page-header">
-          <h1>Tenant Configuration</h1>
+          <h1>Settings</h1>
         </div>
 
         <div className="content-wrapper">
@@ -111,13 +117,17 @@ const TenantSettings = () => {
             <div className="loading">Loading configuration...</div>
           ) : config ? (
             <div className="config-display">
+
+              {/* ================= BRAND ================= */}
               <div className="config-card">
                 <h3>Brand Settings</h3>
                 <div className="config-section">
+
                   <div className="config-row">
                     <label>Name:</label>
                     <span>{config.brand?.name || "Not set"}</span>
                   </div>
+
                   <div className="config-row">
                     <label>Primary Color:</label>
                     <div className="color-display">
@@ -131,6 +141,7 @@ const TenantSettings = () => {
                       <span>{config.brand?.primaryColor || "Not set"}</span>
                     </div>
                   </div>
+
                   <div className="config-row">
                     <label>Secondary Color:</label>
                     <div className="color-display">
@@ -144,10 +155,12 @@ const TenantSettings = () => {
                       <span>{config.brand?.secondaryColor || "Not set"}</span>
                     </div>
                   </div>
+
                   <div className="config-row">
                     <label>Font Family:</label>
                     <span>{config.brand?.fontFamily || "Not set"}</span>
                   </div>
+
                   <div className="config-row">
                     <label>Logo URL:</label>
                     <span className="url-text">
@@ -157,13 +170,16 @@ const TenantSettings = () => {
                 </div>
               </div>
 
+              {/* ================= THEME ================= */}
               <div className="config-card">
                 <h3>Theme Settings</h3>
                 <div className="config-section">
+
                   <div className="config-row">
                     <label>Mode:</label>
                     <span>{config.uiTheme?.mode || "Not set"}</span>
                   </div>
+
                   <div className="config-row">
                     <label>Accent Color:</label>
                     <div className="color-display">
@@ -177,97 +193,15 @@ const TenantSettings = () => {
                       <span>{config.uiTheme?.accentColor || "Not set"}</span>
                     </div>
                   </div>
+
                   <div className="config-row">
                     <label>Layout Style:</label>
                     <span>{config.uiTheme?.layoutStyle || "Not set"}</span>
                   </div>
+
                   <div className="config-row">
                     <label>Corner Style:</label>
                     <span>{config.uiTheme?.cornerStyle || "Not set"}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="config-card">
-                <h3>Localization Settings</h3>
-                <div className="config-section">
-                  <div className="config-row">
-                    <label>Language:</label>
-                    <span>{config.localization?.language || "Not set"}</span>
-                  </div>
-                  <div className="config-row">
-                    <label>Timezone:</label>
-                    <span>{config.localization?.timezone || "Not set"}</span>
-                  </div>
-                  <div className="config-row">
-                    <label>Currency:</label>
-                    <span>{config.localization?.currency || "Not set"}</span>
-                  </div>
-                  <div className="config-row">
-                    <label>Date Format:</label>
-                    <span>{config.localization?.dateFormat || "Not set"}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="config-card">
-                <h3>Features</h3>
-                <div className="config-section">
-                  <div className="feature-row">
-                    <label>Inventory Module:</label>
-                    <span
-                      className={`status ${
-                        config.features?.inventoryModule
-                          ? "enabled"
-                          : "disabled"
-                      }`}
-                    >
-                      {config.features?.inventoryModule
-                        ? "✓ Enabled"
-                        : "✗ Disabled"}
-                    </span>
-                  </div>
-                  <div className="feature-row">
-                    <label>Reporting Module:</label>
-                    <span
-                      className={`status ${
-                        config.features?.reportingModule
-                          ? "enabled"
-                          : "disabled"
-                      }`}
-                    >
-                      {config.features?.reportingModule
-                        ? "✓ Enabled"
-                        : "✗ Disabled"}
-                    </span>
-                  </div>
-                  <div className="feature-row">
-                    <label>Supplier Management:</label>
-                    <span
-                      className={`status ${
-                        config.features?.supplierManagement
-                          ? "enabled"
-                          : "disabled"
-                      }`}
-                    >
-                      {config.features?.supplierManagement
-                        ? "✓ Enabled"
-                        : "✗ Disabled"}
-                    </span>
-                  </div>
-                  <div className="feature-row">
-                    <label>Advanced Pricing:</label>
-                    <span
-                      className={`status ${
-                        config.features?.advancedPricing
-                          ? "enabled"
-                          : "disabled"
-                      }`}
-                    >
-                      {config.features?.advancedPricing
-                        ? "✓ Enabled"
-                        : "✗ Disabled"}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -276,6 +210,7 @@ const TenantSettings = () => {
                 <button onClick={handleEditConfig} className="btn btn-primary">
                   Edit Configuration
                 </button>
+
                 <button
                   onClick={handleInitializeConfig}
                   className="btn btn-secondary"
@@ -286,19 +221,8 @@ const TenantSettings = () => {
             </div>
           ) : (
             <div className="no-data">
-              <div className="no-config-message">
-                <Building2
-                  size={48}
-                  color="#3b82f6"
-                  style={{ marginBottom: "16px" }}
-                />
-                <h3>No Configuration Found</h3>
-                <p>Your tenant configuration hasn't been set up yet.</p>
-                <p>
-                  Click the button below to create a default configuration with
-                  standard settings.
-                </p>
-              </div>
+              <Building2 size={48} color="#3b82f6" />
+              <h3>No Configuration Found</h3>
               <button
                 onClick={handleInitializeConfig}
                 className="btn btn-primary"

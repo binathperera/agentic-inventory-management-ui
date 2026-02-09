@@ -3,7 +3,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { userService } from "../services/api";
 import type { User } from "../types";
 import Navigation from "../components/Navigation";
+import "../styles/UserManagement.css";
 import "../styles/Suppliers.css";
+import "./UserManagement.css";
+
+interface RoleObject {
+  name: string;
+}
 
 const UserManagement = () => {
   const { user: currentUser } = useAuth();
@@ -11,6 +17,8 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -23,27 +31,71 @@ const UserManagement = () => {
       setUsers(data);
       setError("");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load users";
+      const message = err instanceof Error ? err.message : "Failed to load users";
       setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteUser = async (username: string) => {
+  const handleDeleteUser = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) {
       return;
     }
 
     try {
-      await userService.deleteUser(username);
+      await userService.deleteUser(id);
       await loadUsers();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to delete user";
+      const message = err instanceof Error ? err.message : "Failed to delete user";
       setError(message);
     }
+  };
+
+  const handlePromoteUser = async (id: string) => {
+    if (!window.confirm("Promote this user to higher role?")) {
+      return;
+    }
+
+    try {
+      await userService.promoteUser(id);
+      await loadUsers();
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to promote user");
+    }
+  };
+
+  const handleDemoteUser = async (id: string) => {
+    if (!window.confirm("Demote this user to lower role?")) {
+      return;
+    }
+
+    try {
+      await userService.demoteUser(id);
+      await loadUsers();
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to demote user");
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setShowEditModal(true);
+  };
+
+  const getRoleDisplay = (roles: string[] | RoleObject[] | unknown): string => {
+    if (!roles || (Array.isArray(roles) && roles.length === 0)) return "No roles";
+    
+    if (Array.isArray(roles)) {
+      if (typeof roles[0] === 'string') {
+        return roles.join(', ');
+      }
+      if (roles[0] && typeof roles[0] === 'object' && 'name' in roles[0]) {
+        return roles.map((role) => (role as RoleObject).name).join(', ');
+      }
+    }
+    
+    return String(roles);
   };
 
   const filteredUsers = users.filter(
@@ -76,46 +128,53 @@ const UserManagement = () => {
           {loading ? (
             <div className="loading">Loading users...</div>
           ) : (
-            <div className="table-container">
+            <div className="table-container users-table-container">
               {filteredUsers.length === 0 ? (
-                <p className="no-data">No users found</p>
+                <p className="no-data no-users">No users found</p>
               ) : (
-                <table className="data-table">
+                <table className="data-table users-table">
                   <thead>
                     <tr>
                       <th>Username</th>
                       <th>Email</th>
-                      <th>Role</th>
+                      <th>Roles</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredUsers.map((user) => (
-                      <tr key={user.username}>
+                      <tr key={user.id || user.username}>
                         <td>{user.username}</td>
                         <td>{user.email}</td>
                         <td>
-                          <span
-                            className={`role-badge role-${
-                              typeof user.roles[0] === "string"
-                                ? user.roles[0].toLowerCase()
-                                : String(user.roles[0]).toLowerCase()
-                            }`}
+                          <span 
+                            className={`role-badge role-${getRoleDisplay(user.roles)
+                              .toLowerCase()
+                              .split(',')[0]
+                              .trim()}`}
                           >
-                            {typeof user.roles[0] === "string"
-                              ? user.roles[0]
-                              : String(user.roles[0])}
+                            {getRoleDisplay(user.roles)}
                           </span>
                         </td>
                         <td>
                           <div className="action-buttons">
                             {currentUser?.email !== user.email && (
-                              <button
-                                onClick={() => handleDeleteUser(user.username)}
-                                className="btn btn-small btn-danger"
-                              >
-                                Delete
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => handleEditUser(user)}
+                                  className="btn btn-small btn-secondary"
+                                  title="Edit roles"
+                                >
+                                  Edit
+                                </button>
+                                
+                                <button
+                                  onClick={() => handleDeleteUser(user.id!)}
+                                  className="btn btn-small btn-danger"
+                                >
+                                  Delete
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>
@@ -127,9 +186,46 @@ const UserManagement = () => {
             </div>
           )}
         </div>
+
+        {/* Edit Modal */}
+        {showEditModal && editingUser && (
+          <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h3>Edit {editingUser.username}</h3>
+              <p>Current role: <strong>{getRoleDisplay(editingUser.roles)}</strong></p>
+              <div className="modal-actions">
+                <button
+                  onClick={() => {
+                    handlePromoteUser(editingUser.id!);
+                    setShowEditModal(false);
+                  }}
+                  className="btn btn-success"
+                >
+                  Promote ↑
+                </button>
+                <button
+                  onClick={() => {
+                    handleDemoteUser(editingUser.id!);
+                    setShowEditModal(false);
+                  }}
+                  className="btn btn-warning"
+                >
+                  Demote ↓
+                </button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default UserManagement;
+
