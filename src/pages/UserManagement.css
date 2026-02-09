@@ -36,9 +36,10 @@
   text-transform: uppercase;
 }
 
-.role-badge.role-admin { background-color: #667eea; color: white; }
+.role-badge.role-admin { background-color: #e8ea66; color: white; }
 .role-badge.role-user { background-color: #28a745; color: white; }
-.role-badge.role-cashier { background-color: #6c757d; color: white; }
+.role-badge.role-cashier { background-color: #4dd7c0; color: white; }
+.role-badge.role-manager { background-color: #2d27e8; color: white; }
 
 .no-users,
 .no-data { text-align: center; padding: 40px; color: #999; }

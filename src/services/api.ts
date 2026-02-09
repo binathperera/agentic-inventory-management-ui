@@ -182,6 +182,14 @@ export const userService = {
     return response.data;
   },
 
+  promoteUser: async (id: string): Promise<void> => {
+    await api.post(`/users/${id}/promote`);
+  },
+  
+  demoteUser: async (id: string): Promise<void> => {
+    await api.post(`/users/${id}/demote`);
+  },
+
   deleteUser: async (id: string): Promise<void> => {
     await api.delete(`/users/${id}`);
   },

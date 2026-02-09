@@ -17,6 +17,8 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -36,18 +38,49 @@ const UserManagement = () => {
     }
   };
 
-  const handleDeleteUser = async (username: string) => {
+  const handleDeleteUser = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) {
       return;
     }
 
     try {
-      await userService.deleteUser(username);
+      await userService.deleteUser(id);
       await loadUsers();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to delete user";
       setError(message);
     }
+  };
+
+  const handlePromoteUser = async (id: string) => {
+    if (!window.confirm("Promote this user to higher role?")) {
+      return;
+    }
+
+    try {
+      await userService.promoteUser(id);
+      await loadUsers();
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to promote user");
+    }
+  };
+
+  const handleDemoteUser = async (id: string) => {
+    if (!window.confirm("Demote this user to lower role?")) {
+      return;
+    }
+
+    try {
+      await userService.demoteUser(id);
+      await loadUsers();
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to demote user");
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setShowEditModal(true);
   };
 
   const getRoleDisplay = (roles: string[] | RoleObject[] | unknown): string => {
@@ -110,7 +143,7 @@ const UserManagement = () => {
                   </thead>
                   <tbody>
                     {filteredUsers.map((user) => (
-                      <tr key={user.username}>
+                      <tr key={user.id || user.username}>
                         <td>{user.username}</td>
                         <td>{user.email}</td>
                         <td>
@@ -126,12 +159,22 @@ const UserManagement = () => {
                         <td>
                           <div className="action-buttons">
                             {currentUser?.email !== user.email && (
-                              <button
-                                onClick={() => handleDeleteUser(user.username)}
-                                className="btn btn-small btn-danger"
-                              >
-                                Delete
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => handleEditUser(user)}
+                                  className="btn btn-small btn-secondary"
+                                  title="Edit roles"
+                                >
+                                  Edit
+                                </button>
+                                
+                                <button
+                                  onClick={() => handleDeleteUser(user.id!)}
+                                  className="btn btn-small btn-danger"
+                                >
+                                  Delete
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>
@@ -143,9 +186,46 @@ const UserManagement = () => {
             </div>
           )}
         </div>
+
+        {/* Edit Modal */}
+        {showEditModal && editingUser && (
+          <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h3>Edit {editingUser.username}</h3>
+              <p>Current role: <strong>{getRoleDisplay(editingUser.roles)}</strong></p>
+              <div className="modal-actions">
+                <button
+                  onClick={() => {
+                    handlePromoteUser(editingUser.id!);
+                    setShowEditModal(false);
+                  }}
+                  className="btn btn-success"
+                >
+                  Promote ↑
+                </button>
+                <button
+                  onClick={() => {
+                    handleDemoteUser(editingUser.id!);
+                    setShowEditModal(false);
+                  }}
+                  className="btn btn-warning"
+                >
+                  Demote ↓
+                </button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default UserManagement;
+
