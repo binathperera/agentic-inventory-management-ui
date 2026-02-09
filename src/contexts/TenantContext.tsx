@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import type { TenantConfig } from "../types";
 import { tenantConfigService } from "../services/api";
 
+/* ================= TYPES ================= */
+
 interface TenantContextType {
   config: TenantConfig | null;
   loading: boolean;
@@ -14,7 +16,6 @@ interface TenantContextType {
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useTenant = () => {
   const context = useContext(TenantContext);
   if (!context) {
@@ -27,19 +28,12 @@ interface TenantProviderProps {
   children: ReactNode;
 }
 
-/**
- * Extracts subdomain from current hostname
- * Examples:
- *   - "acme.localhost" returns "acme"
- *   - "acme.example.com" returns "acme"
- *   - "localhost" returns null (root/default domain)
- */
+/* ================= SUBDOMAIN DETECTION ================= */
+
 const extractSubdomainFromHost = (): string | null => {
   const hostname = window.location.hostname;
 
-  // Handle localhost with subdomain (e.g., "acme.localhost")
   if (hostname.includes("localhost")) {
-    console.log(hostname);
     const parts = hostname.split(".");
     if (parts.length > 1 && parts[0] !== "localhost") {
       return parts[0];
@@ -47,7 +41,6 @@ const extractSubdomainFromHost = (): string | null => {
     return null;
   }
 
-  // Handle other domains (e.g., "acme.example.com")
   const parts = hostname.split(".");
   if (parts.length > 2) {
     return parts[0];
@@ -56,11 +49,114 @@ const extractSubdomainFromHost = (): string | null => {
   return null;
 };
 
+/* ================= THEME + LOCALIZATION APPLICATION ================= */
+
+const applyThemeAndLocalization = (config: TenantConfig) => {
+  if (!config) return;
+
+  const root = document.documentElement;
+
+  /* ---------- Brand Colors ---------- */
+  if (config.brand?.primaryColor) {
+    root.style.setProperty("--primary-color", config.brand.primaryColor);
+  }
+
+  if (config.brand?.secondaryColor) {
+    root.style.setProperty("--secondary-color", config.brand.secondaryColor);
+  }
+
+  if (config.uiTheme?.accentColor) {
+    root.style.setProperty("--accent-color", config.uiTheme.accentColor);
+  }
+
+  /* ---------- Dynamic Google Font ---------- */
+  if (config.brand?.fontFamily) {
+    const fontFamily = config.brand.fontFamily;
+    document.body.style.fontFamily = fontFamily;
+
+    const fontName = fontFamily
+      .split(",")[0]
+      .replace(/'/g, "")
+      .trim();
+
+    const linkId = "tenant-dynamic-font";
+    const existing = document.getElementById(linkId);
+    if (existing) existing.remove();
+
+    const link = document.createElement("link");
+    link.id = linkId;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(
+      / /g,
+      "+"
+    )}:wght@300;400;500;600;700&display=swap`;
+
+    document.head.appendChild(link);
+  }
+
+  /* ---------- Dark Mode ---------- */
+  if (config.uiTheme?.mode === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+
+  /* ---------- Favicon ---------- */
+  if (config.brand?.faviconUrl) {
+    let favicon = document.querySelector(
+      "link[rel='icon']"
+    ) as HTMLLinkElement | null;
+
+    if (!favicon) {
+      favicon = document.createElement("link");
+      favicon.rel = "icon";
+      document.head.appendChild(favicon);
+    }
+
+    favicon.href = config.brand.faviconUrl;
+  }
+
+  /* ---------- Page Title ---------- */
+  if (config.brand?.name) {
+    document.title = config.brand.name;
+  }
+
+  /* ================= LOCALIZATION ================= */
+
+  const localization = config.localization;
+
+  if (localization) {
+    if (localization.language) {
+      document.documentElement.lang = localization.language;
+    }
+
+    if (localization.currency) {
+      root.style.setProperty("--currency", localization.currency);
+    }
+
+    if (localization.dateFormat) {
+      root.style.setProperty("--date-format", localization.dateFormat);
+    }
+
+    if (localization.timezone) {
+      root.style.setProperty("--timezone", localization.timezone);
+    }
+  }
+};
+
+/* ================= PROVIDER ================= */
+
 export const TenantProvider = ({ children }: TenantProviderProps) => {
-  const [config, setConfig] = useState<TenantConfig | null>(null);
+  const [config, setConfigState] = useState<TenantConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [subdomain, setSubdomain] = useState<string | null>(null);
+
+  const setConfig = (newConfig: TenantConfig) => {
+    setConfigState(newConfig);
+    applyThemeAndLocalization(newConfig);
+    sessionStorage.setItem("tenantConfig", JSON.stringify(newConfig));
+  };
 
   const fetchConfigBySubdomain = async (
     subDomain: string
@@ -68,12 +164,12 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
     try {
       setLoading(true);
       setError(null);
-      const tenantConfig = await tenantConfigService.getConfigBySubDomain(
-        subDomain
-      );
+
+      const tenantConfig =
+        await tenantConfigService.getConfigBySubDomain(subDomain);
+
       setConfig(tenantConfig);
-      // Store in sessionStorage for use across page reloads during same session
-      sessionStorage.setItem("tenantConfig", JSON.stringify(tenantConfig));
+
       return tenantConfig;
     } catch (err) {
       const errorMessage =
@@ -85,36 +181,38 @@ export const TenantProvider = ({ children }: TenantProviderProps) => {
     }
   };
 
-  // Initialize tenant config on mount
+  /* ================= INITIALIZATION ================= */
+
   useEffect(() => {
     const initializeTenant = async () => {
       try {
         const detectedSubdomain = extractSubdomainFromHost();
         setSubdomain(detectedSubdomain);
 
-        // If subdomain exists, fetch its config
         if (detectedSubdomain) {
           await fetchConfigBySubdomain(detectedSubdomain);
         } else {
-          // Default domain - no specific config needed yet
+          const saved = sessionStorage.getItem("tenantConfig");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            setConfig(parsed);
+          }
           setLoading(false);
         }
-      } catch (err: unknown) {
-        // 404 is expected when subdomain doesn't exist - don't log as error
-        if (err && typeof err === 'object' && 'response' in err && 
-            err.response && typeof err.response === 'object' && 'status' in err.response && 
-            err.response.status === 404) {
-          setError("Subdomain not found");
-        } else {
-          console.error("Failed to initialize tenant config:", err);
-          setError("Invalid subdomain - configuration not found");
-        }
+      } catch {
+        setError("Tenant configuration not found");
         setLoading(false);
       }
     };
 
     initializeTenant();
   }, []);
+
+  useEffect(() => {
+    if (config) {
+      applyThemeAndLocalization(config);
+    }
+  }, [config]);
 
   return (
     <TenantContext.Provider
