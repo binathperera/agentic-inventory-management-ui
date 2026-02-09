@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AxiosError } from "axios";
 import { supplierService } from "../services/api";
 import type { Supplier } from "../types";
 import Navigation from "../components/Navigation";
@@ -28,8 +29,27 @@ const Suppliers = () => {
       setSuppliers(result);
       setError("");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load suppliers";
+      let message = "Failed to load suppliers";
+      if (err instanceof Error) {
+        message = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        const axiosError = err as AxiosError;
+        
+        if (axiosError.code === "ERR_NETWORK" && !axiosError.response) {
+          message = "CORS Error: Cannot connect to backend API. Please ensure:\n1. Backend API is running at http://localhost:8080\n2. The frontend dev server has been restarted to apply CORS proxy settings\n3. Browser console shows CORS error details";
+        } else if (axiosError.response?.status === 403) {
+          message = "Access denied: You don't have permission to view suppliers";
+        } else if (axiosError.response?.status === 401) {
+          message = "Authentication failed: Please log in again";
+        } else if (axiosError.response?.status === 500) {
+          message = "Server error: Please try again later";
+        } else if (axiosError.response?.data && typeof axiosError.response.data === 'object' && 'message' in axiosError.response.data) {
+          message = (axiosError.response.data as { message: string }).message;
+        } else if (axiosError.message === "Network Error") {
+          message = "Network error: Unable to connect to the server. Please check your connection and ensure the backend API is running.";
+        }
+      }
+      console.error("[Suppliers] Load error:", err);
       setError(message);
     } finally {
       setLoading(false);
@@ -93,9 +113,6 @@ const Suppliers = () => {
       <div className="page-content">
         <div className="page-header">
           <h1>Supplier Management</h1>
-          <p className="subtitle">
-            Manage your suppliers and their information
-          </p>
         </div>
 
         {/* Supplier Statistics */}
@@ -116,7 +133,7 @@ const Suppliers = () => {
             <div className="stat-content">
               <div className="stat-label">Verified Contacts</div>
               <div className="stat-value">
-                {suppliers.filter((s) => s.email).length}
+                          {suppliers.filter((s) => s.email).length}
               </div>
             </div>
           </div>

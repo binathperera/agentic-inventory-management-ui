@@ -98,7 +98,7 @@ const TenantSettings = () => {
       <Navigation />
       <div className="page-content">
         <div className="page-header">
-          <h1>Tenant Configuration</h1>
+          <h1>Settings</h1>
         </div>
 
         <div className="content-wrapper">

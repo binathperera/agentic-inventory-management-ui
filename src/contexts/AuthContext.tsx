@@ -11,6 +11,8 @@ interface AuthContextType {
   signup: (userData: SignupRequest) => Promise<User>;
   logout: () => void;
   isAdmin: () => boolean | undefined;
+  hasRole: (role: string) => boolean | undefined;
+  hasAnyRole: (roles: string[]) => boolean | undefined;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,8 +34,11 @@ interface AuthProviderProps {
 
 interface JWTPayload {
   sub: string;
-  userId: number;
-  role: string;
+  userId?: string;
+  username: string;
+  email?: string;
+  tenantId: string;
+  roles?: (string | { id: string; name: string })[];
   exp: number;
 }
 
@@ -132,12 +137,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const isAdmin = () => {
-    return user?.roles.includes("ADMIN");
+    return hasRole('ADMIN');
+  };
+
+  const hasRole = (role: string) => {
+    if (!user?.roles) return false;
+    const roleUpper = role.toUpperCase();
+    return user.roles.some(r => {
+      if (typeof r === 'string') {
+        return r.toUpperCase() === roleUpper;
+      }
+      return (r as { id: string; name: string }).name?.toUpperCase() === roleUpper;
+    });
+  };
+
+  const hasAnyRole = (roles: string[]) => {
+    return roles.some(role => hasRole(role));
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, signup, logout, isAdmin }}
+      value={{ user, loading, login, signup, logout, isAdmin, hasRole, hasAnyRole }}
     >
       {children}
     </AuthContext.Provider>
