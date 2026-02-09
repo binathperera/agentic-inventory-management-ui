@@ -33,15 +33,15 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add JWT token
+// FIXED Request interceptor - Adds JWT + TENANT ID
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log("[API] Token found, Authorization header set");
+      
       try {
-        // Decode and log token payload for debugging
         const base64Url = token.split('.')[1];
         if (base64Url) {
           const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -49,22 +49,26 @@ api.interceptors.request.use(
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
           }).join(''));
           const decoded = JSON.parse(jsonPayload);
-          console.log("[API] Token payload - Roles:", decoded.roles, "TenantId:", decoded.tenantId, "Username:", decoded.username);
+          
+          if (decoded.tenantId) {
+            config.headers['X-Tenant-Id'] = decoded.tenantId;
+            console.log("[API] ✅ Added tenantId:", decoded.tenantId);
+          }
+          
+          console.log("[API] Token payload - Roles:", decoded.roles, "TenantId:", decoded.tenantId);
         }
       } catch {
-        console.log("[API] Could not decode token for debugging");
+        console.log("[API] Could not decode token");
       }
     } else {
       console.log("[API] No token found in localStorage");
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle token expiration
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -74,19 +78,15 @@ api.interceptors.response.use(
       localStorage.removeItem("user");
     }
 
-    // Log all errors for debugging
     console.error("[API] Error occurred:");
     console.error("  URL:", error.config?.url);
     console.error("  Method:", error.config?.method);
     console.error("  Status:", error.response?.status);
     console.error("  Status Text:", error.response?.statusText);
     console.error("  Response Data:", error.response?.data);
+    console.error("  Tenant-Id:", error.config?.headers?.['X-Tenant-Id']);
     console.error("  Auth Header:", error.config?.headers?.Authorization);
-    console.error("  Error Message:", error.message);
-    if (error.request && !error.response) {
-      console.error("  Network Error - No response received");
-    }
-
+    
     return Promise.reject(error);
   }
 );
@@ -206,7 +206,7 @@ export const supplierService = {
     try {
       console.log("[SupplierService] Fetching all suppliers...");
       const response = await api.get<Supplier[]>("/suppliers");
-      console.log("[SupplierService] Successfully fetched suppliers:", response.data);
+      console.log("[SupplierService] Successfully fetched suppliers:", response.data.length);
       return response.data;
     } catch (error) {
       console.error("[SupplierService] Error fetching suppliers:", error);
@@ -245,7 +245,7 @@ export const invoiceService = {
     try {
       console.log("[InvoiceService] Fetching all invoices...");
       const response = await api.get<Invoice[]>("/invoices");
-      console.log("[InvoiceService] Successfully fetched invoices:", response.data);
+      console.log("[InvoiceService] Successfully fetched invoices:", response.data.length);
       return response.data;
     } catch (error) {
       console.error("[InvoiceService] Error fetching invoices:", error);
@@ -330,7 +330,7 @@ export const transactionService = {
     try {
       console.log("[TransactionService] Fetching all transactions...");
       const response = await api.get<Transaction[]>("/transactions");
-      console.log("[TransactionService] Successfully fetched transactions:", response.data);
+      console.log("[TransactionService] Successfully fetched transactions:", response.data.length);
       return response.data;
     } catch (error) {
       console.error("[TransactionService] Error fetching transactions:", error);

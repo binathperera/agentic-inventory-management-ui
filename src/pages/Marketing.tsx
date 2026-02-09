@@ -45,7 +45,7 @@ export default function Marketing() {
           <h2>Get Started Today!</h2>
           <p>
             Contact us to set up your personalized inventory management system.
-          </p>
+          </p><br />
           <a href="mailto:support@inventorysystem.com">Email Us</a>
         </div>
       </div>
