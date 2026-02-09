@@ -234,9 +234,6 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <p className="kpi-footer">
-                Real-time analytics and insights coming soon.
-              </p>
             </div>
           </div>
         </div>

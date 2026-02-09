@@ -3,7 +3,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { userService } from "../services/api";
 import type { User } from "../types";
 import Navigation from "../components/Navigation";
+import "../styles/UserManagement.css";
 import "../styles/Suppliers.css";
+import "./UserManagement.css";
+
+interface RoleObject {
+  name: string;
+}
 
 const UserManagement = () => {
   const { user: currentUser } = useAuth();
@@ -23,8 +29,7 @@ const UserManagement = () => {
       setUsers(data);
       setError("");
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load users";
+      const message = err instanceof Error ? err.message : "Failed to load users";
       setError(message);
     } finally {
       setLoading(false);
@@ -40,10 +45,24 @@ const UserManagement = () => {
       await userService.deleteUser(username);
       await loadUsers();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to delete user";
+      const message = err instanceof Error ? err.message : "Failed to delete user";
       setError(message);
     }
+  };
+
+  const getRoleDisplay = (roles: string[] | RoleObject[] | unknown): string => {
+    if (!roles || (Array.isArray(roles) && roles.length === 0)) return "No roles";
+    
+    if (Array.isArray(roles)) {
+      if (typeof roles[0] === 'string') {
+        return roles.join(', ');
+      }
+      if (roles[0] && typeof roles[0] === 'object' && 'name' in roles[0]) {
+        return roles.map((role) => (role as RoleObject).name).join(', ');
+      }
+    }
+    
+    return String(roles);
   };
 
   const filteredUsers = users.filter(
@@ -76,16 +95,16 @@ const UserManagement = () => {
           {loading ? (
             <div className="loading">Loading users...</div>
           ) : (
-            <div className="table-container">
+            <div className="table-container users-table-container">
               {filteredUsers.length === 0 ? (
-                <p className="no-data">No users found</p>
+                <p className="no-data no-users">No users found</p>
               ) : (
-                <table className="data-table">
+                <table className="data-table users-table">
                   <thead>
                     <tr>
                       <th>Username</th>
                       <th>Email</th>
-                      <th>Role</th>
+                      <th>Roles</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -95,16 +114,13 @@ const UserManagement = () => {
                         <td>{user.username}</td>
                         <td>{user.email}</td>
                         <td>
-                          <span
-                            className={`role-badge role-${
-                              typeof user.roles[0] === "string"
-                                ? user.roles[0].toLowerCase()
-                                : String(user.roles[0]).toLowerCase()
-                            }`}
+                          <span 
+                            className={`role-badge role-${getRoleDisplay(user.roles)
+                              .toLowerCase()
+                              .split(',')[0]
+                              .trim()}`}
                           >
-                            {typeof user.roles[0] === "string"
-                              ? user.roles[0]
-                              : String(user.roles[0])}
+                            {getRoleDisplay(user.roles)}
                           </span>
                         </td>
                         <td>
