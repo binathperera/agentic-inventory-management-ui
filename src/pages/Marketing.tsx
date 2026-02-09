@@ -21,6 +21,10 @@ export default function Marketing() {
         <div className="nav-logo">
           <img src={logo} alt="ABC Logo" />
           <span>ABC (Pvt) Ltd</span>
+          
+        </div>
+        <div>
+          <a href="http://abc.localhost:3000/login" className="nav-link">login</a>
         </div>
       </nav>
 
