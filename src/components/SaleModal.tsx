@@ -28,7 +28,7 @@ const SaleModal = ({ transaction, products, onSave, onClose }: SaleModalProps) =
 
   useEffect(() => {
     if (transaction && transaction.items) {
-      setPaymentMethod(transaction.paymentMethod);
+      setPaymentMethod(transaction.paymentMethod ?? "CASH");
       setDiscountAmount(transaction.discountAmount);
       setPaidAmount(transaction.paidAmount);
       setItems(transaction.items.map(item => ({

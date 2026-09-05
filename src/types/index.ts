@@ -129,8 +129,8 @@ export interface ProductBatchUpdateRequest {
 // Transaction types
 export interface Transaction {
   id: string;
-  transactionId: string;
-  paymentMethod: string;
+  transactionId: string | null;
+  paymentMethod: string | null;
   grossAmount: number;
   discountAmount: number;
   netAmount: number;

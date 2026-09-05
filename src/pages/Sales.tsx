@@ -66,13 +66,12 @@ const Sales = () => {
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
+    const normalizedSearchTerm = searchTerm.toLowerCase();
+    const transactionId = String(transaction.transactionId ?? "").toLowerCase();
+    const paymentMethod = String(transaction.paymentMethod ?? "").toLowerCase();
     const matchesSearch =
-      transaction.transactionId
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      transaction.paymentMethod
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      transactionId.includes(normalizedSearchTerm) ||
+      paymentMethod.includes(normalizedSearchTerm);
     const matchesPayment =
       filterPaymentMethod === "all" ||
       transaction.paymentMethod === filterPaymentMethod;
@@ -92,10 +91,14 @@ const Sales = () => {
   const totalPaid = transactions.reduce((sum, t) => sum + t.paidAmount, 0);
   const totalPending = transactions.reduce(
     (sum, t) => sum + t.balanceAmount,
-    0
+    0,
   );
   const paymentMethods = [
-    ...new Set(transactions.map((t) => t.paymentMethod).filter(Boolean)),
+    ...new Set(
+      transactions
+        .map((t) => t.paymentMethod)
+        .filter((method): method is string => Boolean(method)),
+    ),
   ];
 
   return (
@@ -214,9 +217,9 @@ const Sales = () => {
                 </thead>
                 <tbody>
                   {sortedTransactions.map((transaction) => (
-                    <tr key={transaction.transactionId}>
-                      <td>{transaction.transactionId}</td>
-                      <td>{transaction.paymentMethod}</td>
+                    <tr key={transaction.id}>
+                      <td>{transaction.transactionId ?? "-"}</td>
+                      <td>{transaction.paymentMethod ?? "-"}</td>
                       <td>${transaction.grossAmount.toFixed(2)}</td>
                       <td>${transaction.discountAmount.toFixed(2)}</td>
                       <td>${transaction.netAmount.toFixed(2)}</td>
@@ -235,7 +238,7 @@ const Sales = () => {
                           </button>
                           <button
                             onClick={() =>
-                              handleDeleteTransaction(transaction.transactionId)
+                              handleDeleteTransaction(transaction.id)
                             }
                             className="btn btn-small btn-danger"
                           >
