@@ -20,7 +20,6 @@ import type {
   TransactionCreateRequest,
   TransactionUpdateRequest,
   TenantConfig,
-  AiChatDocument,
 } from "../types";
 
 const API_BASE_URL = "http://localhost:8080/api";
@@ -46,7 +45,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor to handle token expiration
@@ -71,7 +70,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // Authentication APIs
@@ -111,7 +110,7 @@ export const productService = {
 
   updateProduct: async (
     id: string,
-    product: ProductUpdateRequest
+    product: ProductUpdateRequest,
   ): Promise<Product> => {
     console.log("Updating product:", id, product);
     const response = await api.put<Product>(`/products/${id}`, product);
@@ -158,7 +157,7 @@ export const supplierService = {
   },
 
   createSupplier: async (
-    supplier: SupplierCreateRequest
+    supplier: SupplierCreateRequest,
   ): Promise<Supplier> => {
     const response = await api.post<Supplier>("/suppliers", supplier);
     return response.data;
@@ -166,7 +165,7 @@ export const supplierService = {
 
   updateSupplier: async (
     id: string,
-    supplier: SupplierUpdateRequest
+    supplier: SupplierUpdateRequest,
   ): Promise<Supplier> => {
     const response = await api.put<Supplier>(`/suppliers/${id}`, supplier);
     return response.data;
@@ -196,7 +195,7 @@ export const invoiceService = {
 
   updateInvoice: async (
     id: string,
-    invoice: InvoiceUpdateRequest
+    invoice: InvoiceUpdateRequest,
   ): Promise<Invoice> => {
     const response = await api.put<Invoice>(`/invoices/${id}`, invoice);
     return response.data;
@@ -216,23 +215,23 @@ export const productBatchService = {
 
   getBatchesByProduct: async (productId: string): Promise<ProductBatch[]> => {
     const response = await api.get<ProductBatch[]>(
-      `/product-batches/product/${productId}`
+      `/product-batches/product/${productId}`,
     );
     return response.data;
   },
 
   getBatchById: async (
     productId: string,
-    invoiceNo: string
+    invoiceNo: string,
   ): Promise<ProductBatch> => {
     const response = await api.get<ProductBatch>(
-      `/product-batches/${productId}/${invoiceNo}`
+      `/product-batches/${productId}/${invoiceNo}`,
     );
     return response.data;
   },
 
   createBatch: async (
-    batch: ProductBatchCreateRequest
+    batch: ProductBatchCreateRequest,
   ): Promise<ProductBatch> => {
     const response = await api.post<ProductBatch>("/product-batches", batch);
     return response.data;
@@ -241,11 +240,11 @@ export const productBatchService = {
   updateBatch: async (
     productId: string,
     invoiceNo: string,
-    batch: ProductBatchUpdateRequest
+    batch: ProductBatchUpdateRequest,
   ): Promise<ProductBatch> => {
     const response = await api.put<ProductBatch>(
       `/product-batches/${productId}/${invoiceNo}`,
-      batch
+      batch,
     );
     return response.data;
   },
@@ -268,7 +267,7 @@ export const transactionService = {
   },
 
   createTransaction: async (
-    transaction: TransactionCreateRequest
+    transaction: TransactionCreateRequest,
   ): Promise<Transaction> => {
     const response = await api.post<Transaction>("/transactions", transaction);
     return response.data;
@@ -276,11 +275,11 @@ export const transactionService = {
 
   updateTransaction: async (
     id: string,
-    transaction: TransactionUpdateRequest
+    transaction: TransactionUpdateRequest,
   ): Promise<Transaction> => {
     const response = await api.put<Transaction>(
       `/transactions/${id}`,
-      transaction
+      transaction,
     );
     return response.data;
   },
@@ -309,7 +308,7 @@ export const tenantConfigService = {
 
   getConfigBySubDomain: async (subDomain: string): Promise<TenantConfig> => {
     const response = await api.get<TenantConfig>(
-      `/tenant-config/by-subdomain/${subDomain}`
+      `/tenant-config/by-subdomain/${subDomain}`,
     );
     return response.data;
   },
@@ -317,10 +316,11 @@ export const tenantConfigService = {
 
 // AI Chat APIs
 export const aiChatService = {
-  query: async (prompt: string): Promise<AiChatDocument[]> => {
-    const response = await api.get<AiChatDocument[]>("/chat/query", {
+  query: async (prompt: string): Promise<string> => {
+    const response = await api.get<string>("/chat/query", {
       params: { prompt },
     });
+    console.log("Raw AI API response:", response.status, response.data);
     return response.data;
   },
 };

@@ -19,6 +19,7 @@ import ProductBatches from "./pages/ProductBatches";
 import Sales from "./pages/Sales";
 import UserManagement from "./pages/UserManagement";
 import TenantSettings from "./pages/TenantSettings";
+import FloatingAgent from "./components/FloatingAgent";
 
 function App() {
   return (
@@ -96,6 +97,7 @@ function App() {
                 }
               />
             </Routes>
+            <FloatingAgent />
           </AuthProvider>
         </SubdomainValidator>
       </TenantProvider>

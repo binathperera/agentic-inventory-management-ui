@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navigation from "../components/Navigation";
 import "../styles/Dashboard.css";
 import { aiChatService } from "../services/api";
-import type { AiChatDocument } from "../types";
+//import type { AiChatDocument } from "../types";
 import {
   Sparkles,
   Send,
@@ -14,7 +14,7 @@ import {
 
 const Dashboard = () => {
   const [prompt, setPrompt] = useState("");
-  const [results, setResults] = useState<AiChatDocument[]>([]);
+  const [results, setResults] = useState<string>("");
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,11 @@ const Dashboard = () => {
 
     try {
       const data = await aiChatService.query(trimmedPrompt);
-      console.log("AI chat documents", data);
+      console.log("AI chat response:", {
+        value: data,
+        type: typeof data,
+        length: data?.length,
+      });
       setResults(data);
     } catch (err) {
       console.error("AI chat query failed", err);
@@ -126,8 +130,10 @@ const Dashboard = () => {
                   {!loading && results.length === 0 && !error && (
                     <div className="ai-chat-empty">No results returned.</div>
                   )}
-
-                  {!loading &&
+                  {!loading && results.length > 0 && (
+                    <div className="ai-chat-response">{results}</div>
+                  )}
+                  {/* {!loading &&
                     results.map((doc, index) => (
                       <div
                         className="ai-chat-message"
@@ -179,7 +185,7 @@ const Dashboard = () => {
                           </div>
                         )}
                       </div>
-                    ))}
+                    ))} */}
                 </div>
               )}
             </div>
