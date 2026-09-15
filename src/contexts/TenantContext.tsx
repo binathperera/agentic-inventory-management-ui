@@ -120,7 +120,7 @@ const applyTenantConfig = (tenantConfig: TenantConfig) => {
     root.style.setProperty("--theme-font-family", brand?.fontFamily || "");
   }
 
-  root.dataset.themeMode = uiTheme?.mode || "light";
+  root.dataset.themeMode = (uiTheme?.mode || "light").toLowerCase();
   root.dataset.layoutStyle = uiTheme?.layoutStyle || "comfortable";
   root.dataset.cornerStyle = uiTheme?.cornerStyle || "sharp";
 
