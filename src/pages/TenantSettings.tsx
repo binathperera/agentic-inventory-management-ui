@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { tenantConfigService } from "../services/api";
+import { DEFAULT_TENANT_CONFIG, useTenant } from "../contexts/TenantContext";
 import type { TenantConfig } from "../types";
 import Navigation from "../components/Navigation";
 import TenantConfigModal from "../components/TenantConfigModal";
@@ -8,6 +9,7 @@ import "../styles/Suppliers.css";
 import "../styles/TenantSettings.css";
 
 const TenantSettings = () => {
+  const { setConfig: setTenantConfig } = useTenant();
   const [config, setConfig] = useState<TenantConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -23,6 +25,7 @@ const TenantSettings = () => {
       setLoading(true);
       const data = await tenantConfigService.getTenantConfig();
       setConfig(data);
+      setTenantConfig(data);
       setError("");
     } catch (err: unknown) {
       // Handle 400 or 404 as config not found - this is expected for new tenants
@@ -46,10 +49,10 @@ const TenantSettings = () => {
 
   const handleUpdateConfig = async (updatedConfig: TenantConfig) => {
     try {
-      const result = await tenantConfigService.updateTenantConfig(
-        updatedConfig
-      );
+      const result =
+        await tenantConfigService.updateTenantConfig(updatedConfig);
       setConfig(result);
+      setTenantConfig(result);
       setSuccessMessage("Configuration updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
       setError("");
@@ -64,7 +67,7 @@ const TenantSettings = () => {
   const handleInitializeConfig = async () => {
     if (
       !window.confirm(
-        "Are you sure you want to initialize the default configuration? This may overwrite existing settings."
+        "Are you sure you want to initialize the default configuration? This may overwrite existing settings.",
       )
     ) {
       return;
@@ -73,7 +76,21 @@ const TenantSettings = () => {
     try {
       setLoading(true);
       const result = await tenantConfigService.initializeTenantConfig();
-      setConfig(result);
+      const initializedConfig: TenantConfig = {
+        ...result,
+        brand: {
+          ...result.brand,
+          ...DEFAULT_TENANT_CONFIG.brand,
+        },
+        uiTheme: {
+          ...result.uiTheme,
+          ...DEFAULT_TENANT_CONFIG.uiTheme,
+        },
+      };
+      const persistedConfig =
+        await tenantConfigService.updateTenantConfig(initializedConfig);
+      setConfig(persistedConfig);
+      setTenantConfig(persistedConfig);
       setSuccessMessage("Configuration initialized successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
       setError("");

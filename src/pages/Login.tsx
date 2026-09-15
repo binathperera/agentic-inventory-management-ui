@@ -37,7 +37,15 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>{config?.brand?.name || "ERP"}</h1>
+        {config?.brand?.logoUrl ? (
+          <img
+            className="auth-brand-logo"
+            src={config.brand.logoUrl}
+            alt={config.brand.name || "Company logo"}
+          />
+        ) : (
+          <h1>{config?.brand?.name || "ERP"}</h1>
+        )}
         <h2>User Login</h2>
 
         {error && <div className="error-message">{error}</div>}

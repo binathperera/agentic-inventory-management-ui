@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTenant } from "../contexts/TenantContext";
 import Navigation from "../components/Navigation";
 import "../styles/Dashboard.css";
 import { aiChatService, transactionService } from "../services/api";
@@ -19,6 +20,7 @@ const renderHighlightedResponse = (response: string) =>
   });
 
 const Dashboard = () => {
+  const { config } = useTenant();
   const [prompt, setPrompt] = useState("");
   const [results, setResults] = useState<string>("");
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
@@ -65,7 +67,16 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="page-with-nav">
+    <div
+      className="page-with-nav dashboard-page"
+      style={
+        config?.brand?.bannerUrl
+          ? ({
+              "--dashboard-banner-image": `url("${config.brand.bannerUrl}")`,
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
       <Navigation />
       <div className="page-content">
         <div className="page-header">

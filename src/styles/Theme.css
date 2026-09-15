@@ -10,10 +10,14 @@
   --theme-accent-dark: #005f63;
   --theme-danger: #b42318;
   --theme-shadow: rgba(16, 42, 67, 0.12);
+  --theme-brand-primary: #007c83;
+  --theme-brand-secondary: #102a43;
+  --theme-font-family: "Aptos", "Segoe UI", sans-serif;
+  --theme-radius: 0px;
 }
 
 * {
-  border-radius: 0 !important;
+  border-radius: var(--theme-radius) !important;
 }
 
 html,
@@ -24,7 +28,37 @@ body {
 }
 
 body {
-  font-family: "Aptos", "Segoe UI", sans-serif;
+  font-family: var(--theme-font-family);
+}
+
+:root[data-corner-style="rounded"] {
+  --theme-radius: 8px;
+}
+
+:root[data-corner-style="smooth"] {
+  --theme-radius: 16px;
+}
+
+:root[data-layout-style="compact"] .content-wrapper,
+:root[data-layout-style="compact"] .stats-container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+:root[data-layout-style="spacious"] .content-wrapper,
+:root[data-layout-style="spacious"] .stats-container {
+  padding-top: 56px;
+  padding-bottom: 40px;
+}
+
+:root[data-theme-mode="dark"] {
+  --theme-canvas: #102a43;
+  --theme-surface: #172f46;
+  --theme-muted: #bcccdc;
+  --theme-line: #486581;
+  --theme-line-soft: #334e68;
+  --theme-ink: #f0f4f6;
+  --theme-ink-strong: #d9e2ec;
 }
 
 button,
@@ -282,6 +316,19 @@ textarea:focus,
   background: none;
   -webkit-text-fill-color: initial;
   letter-spacing: 0;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-logo {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  object-fit: contain;
 }
 
 .nav-link {

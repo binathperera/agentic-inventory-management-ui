@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useTenant } from "../contexts/TenantContext";
 import "../styles/Navigation.css";
 import {
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
 
 const Navigation = () => {
   const { user, logout, isAdmin } = useAuth();
+  const { config } = useTenant();
   const location = useLocation();
 
   const isActive = (path: string) => {
@@ -24,7 +26,14 @@ const Navigation = () => {
   return (
     <nav className="navigation">
       <div className="nav-header">
-        <h2 className="nav-title">ABC (Pvt) Ltd</h2>
+        <div className="nav-brand">
+          {config?.brand?.logoUrl && (
+            <img className="nav-logo" src={config.brand.logoUrl} alt="" />
+          )}
+          <h2 className="nav-title">
+            {config?.brand?.name || "ABC (Pvt) Ltd"}
+          </h2>
+        </div>
         <div className="user-info-nav">
           <span className="user-name-nav">{user?.username}</span>
           <span className="user-role-nav">

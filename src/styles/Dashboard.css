@@ -6,6 +6,25 @@
   margin-bottom: 30px;
 }
 
+.dashboard-page .page-content {
+  background-image:
+    linear-gradient(rgba(240, 244, 246, 0.82), rgba(240, 244, 246, 0.82)),
+    var(--dashboard-banner-image, none),
+    linear-gradient(#d9e2e8 1px, transparent 1px),
+    linear-gradient(90deg, #d9e2e8 1px, transparent 1px);
+  background-size:
+    cover,
+    cover,
+    32px 32px,
+    32px 32px;
+  background-position:
+    center,
+    center,
+    0 0,
+    0 0;
+  background-attachment: fixed, fixed, scroll, scroll;
+}
+
 .search-input {
   flex: 1;
   max-width: 400px;

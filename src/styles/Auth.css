@@ -23,6 +23,14 @@
   text-align: center;
 }
 
+.auth-brand-logo {
+  display: block;
+  width: min(100%, 220px);
+  max-height: 88px;
+  margin: 0 auto 18px;
+  object-fit: contain;
+}
+
 .auth-card h2 {
   color: #667eea;
   font-size: 28px;

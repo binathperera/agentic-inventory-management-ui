@@ -71,7 +71,7 @@ const TenantConfigModal = ({
 
   const handleLocalizationChange = (
     field: keyof Localization,
-    value: string
+    value: string,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -223,7 +223,7 @@ const TenantConfigModal = ({
                     <input
                       id="primary-color"
                       type="color"
-                      value={formData.brand?.primaryColor || "#1976d2"}
+                      value={formData.brand?.primaryColor || "#007c83"}
                       onChange={(e) =>
                         handleBrandChange("primaryColor", e.target.value)
                       }
@@ -231,7 +231,7 @@ const TenantConfigModal = ({
                     />
                     <input
                       type="text"
-                      value={formData.brand?.primaryColor || "#1976d2"}
+                      value={formData.brand?.primaryColor || "#007c83"}
                       onChange={(e) =>
                         handleBrandChange("primaryColor", e.target.value)
                       }
@@ -247,7 +247,7 @@ const TenantConfigModal = ({
                     <input
                       id="secondary-color"
                       type="color"
-                      value={formData.brand?.secondaryColor || "#dc004e"}
+                      value={formData.brand?.secondaryColor || "#102a43"}
                       onChange={(e) =>
                         handleBrandChange("secondaryColor", e.target.value)
                       }
@@ -255,7 +255,7 @@ const TenantConfigModal = ({
                     />
                     <input
                       type="text"
-                      value={formData.brand?.secondaryColor || "#dc004e"}
+                      value={formData.brand?.secondaryColor || "#102a43"}
                       onChange={(e) =>
                         handleBrandChange("secondaryColor", e.target.value)
                       }
@@ -305,7 +305,7 @@ const TenantConfigModal = ({
                   <input
                     id="accent-color"
                     type="color"
-                    value={formData.uiTheme?.accentColor || "#f50057"}
+                    value={formData.uiTheme?.accentColor || "#007c83"}
                     onChange={(e) =>
                       handleThemeChange("accentColor", e.target.value)
                     }
@@ -313,7 +313,7 @@ const TenantConfigModal = ({
                   />
                   <input
                     type="text"
-                    value={formData.uiTheme?.accentColor || "#f50057"}
+                    value={formData.uiTheme?.accentColor || "#007c83"}
                     onChange={(e) =>
                       handleThemeChange("accentColor", e.target.value)
                     }
@@ -460,7 +460,7 @@ const TenantConfigModal = ({
                     onChange={(e) =>
                       handleFeaturesChange(
                         "supplierManagement",
-                        e.target.checked
+                        e.target.checked,
                       )
                     }
                     disabled={submitting || loading}
