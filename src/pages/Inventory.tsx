@@ -1,18 +1,30 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { productService } from "../services/api";
-import type { Product } from "../types";
+import { productBatchService, productService } from "../services/api";
+import type { Product, ProductBatch } from "../types";
 import Navigation from "../components/Navigation";
+import InventoryAlertPanel from "../components/InventoryAlertPanel";
 import ProductModal from "../components/ProductModal";
 import ProductTable from "../components/ProductTable.tsx";
-import { Package, DollarSign, AlertTriangle } from "lucide-react";
+import { AlertTriangle, CalendarClock, CalendarX } from "lucide-react";
 import "../styles/Dashboard.css";
+
+type InventoryAlert = "expiringSoon" | "expired" | "lowStock" | null;
+
+const getExpiryTime = (expiry: string | undefined) => {
+  if (!expiry) return null;
+  const time = new Date(expiry).getTime();
+  return Number.isNaN(time) ? null : time;
+};
 
 const Inventory = () => {
   const { isAdmin } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
+  const [batches, setBatches] = useState<ProductBatch[]>([]);
   const [loading, setLoading] = useState(true);
+  const [batchesLoading, setBatchesLoading] = useState(true);
   const [error, setError] = useState("");
+  const [alert, setAlert] = useState<InventoryAlert>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +32,7 @@ const Inventory = () => {
 
   useEffect(() => {
     loadProducts();
+    loadBatches();
   }, []);
 
   const loadProducts = async () => {
@@ -34,6 +47,20 @@ const Inventory = () => {
       setError(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadBatches = async () => {
+    try {
+      setBatchesLoading(true);
+      const data = await productBatchService.getAllBatches();
+      setBatches(data);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load product batches";
+      setError(message);
+    } finally {
+      setBatchesLoading(false);
     }
   };
 
@@ -67,6 +94,7 @@ const Inventory = () => {
     name: string;
     latestBatchNo?: string;
     remainingQuantity?: number;
+    criticalStockLevel?: number;
     latestUnitPrice?: number;
   }) => {
     try {
@@ -78,6 +106,8 @@ const Inventory = () => {
             productData.latestBatchNo || editingProduct.latestBatchNo,
           remainingQuantity:
             productData.remainingQuantity ?? editingProduct.remainingQuantity,
+          criticalStockLevel:
+            productData.criticalStockLevel ?? editingProduct.criticalStockLevel,
           latestUnitPrice:
             productData.latestUnitPrice ?? editingProduct.latestUnitPrice,
         };
@@ -90,8 +120,9 @@ const Inventory = () => {
           id: productData.id,
           name: productData.name,
           latestBatchNo: productData.latestBatchNo || "BATCH-001",
-          remainingQuantity: productData.remainingQuantity || 0,
-          latestUnitPrice: productData.latestUnitPrice || 0,
+          remainingQuantity: productData.remainingQuantity ?? 0,
+          criticalStockLevel: productData.criticalStockLevel ?? 10,
+          latestUnitPrice: productData.latestUnitPrice ?? 0,
         };
         await productService.createProduct(createPayload);
       }
@@ -120,14 +151,45 @@ const Inventory = () => {
     return 0;
   });
 
-  const totalProducts = products.length;
-  const totalValue = products.reduce(
-    (sum, p) => sum + (p.latestUnitPrice || 0) * (p.remainingQuantity || 0),
-    0
+  const now = Date.now();
+  const sevenDaysFromNow = now + 7 * 24 * 60 * 60 * 1000;
+  const expiredBatches = batches.filter((batch) => {
+    const expiryTime = getExpiryTime(batch.exp);
+    return expiryTime !== null && expiryTime < now;
+  });
+  const expiringSoonBatches = batches.filter((batch) => {
+    const expiryTime = getExpiryTime(batch.exp);
+    return (
+      expiryTime !== null && expiryTime >= now && expiryTime <= sevenDaysFromNow
+    );
+  });
+  const expiringSoonCount = expiringSoonBatches.reduce(
+    (total, batch) => total + batch.qty,
+    0,
+  );
+  const expiredCount = expiredBatches.reduce(
+    (total, batch) => total + batch.qty,
+    0,
   );
   const lowStockCount = products.filter(
-    (p) => (p.remainingQuantity || 0) < 10
+    (p) => (p.remainingQuantity || 0) < (p.criticalStockLevel ?? 10),
   ).length;
+  const lowStockProducts = products.filter(
+    (product) =>
+      (product.remainingQuantity || 0) < (product.criticalStockLevel ?? 10),
+  );
+  const productNames = products.reduce<Record<string, string>>(
+    (names, product) => {
+      names[product.id] = product.name;
+      return names;
+    },
+    {},
+  );
+
+  const showAlert = (nextAlert: InventoryAlert) => {
+    if (batchesLoading && nextAlert !== "lowStock") return;
+    setAlert(nextAlert);
+  };
 
   return (
     <div className="page-with-nav">
@@ -139,25 +201,37 @@ const Inventory = () => {
         </div>
 
         <div className="stats-container">
-          <div className="stat-card">
+          <button
+            type="button"
+            className="stat-card stat-card-action"
+            onClick={() => showAlert("expiringSoon")}
+          >
             <div className="stat-icon">
-              <Package size={32} color="#3b82f6" />
+              <CalendarClock size={32} color="#007c83" />
             </div>
             <div className="stat-content">
-              <div className="stat-label">Total Products</div>
-              <div className="stat-value">{totalProducts}</div>
+              <div className="stat-label">Expiring Soon</div>
+              <div className="stat-value">{expiringSoonCount}</div>
             </div>
-          </div>
-          <div className="stat-card">
+          </button>
+          <button
+            type="button"
+            className="stat-card stat-card-action"
+            onClick={() => showAlert("expired")}
+          >
             <div className="stat-icon">
-              <DollarSign size={32} color="#10b981" />
+              <CalendarX size={32} color="#b42318" />
             </div>
             <div className="stat-content">
-              <div className="stat-label">Total Inventory Value</div>
-              <div className="stat-value">${totalValue.toFixed(2)}</div>
+              <div className="stat-label">Expired Items</div>
+              <div className="stat-value">{expiredCount}</div>
             </div>
-          </div>
-          <div className="stat-card">
+          </button>
+          <button
+            type="button"
+            className="stat-card stat-card-action"
+            onClick={() => showAlert("lowStock")}
+          >
             <div className="stat-icon">
               <AlertTriangle size={32} color="#ef4444" />
             </div>
@@ -170,8 +244,36 @@ const Inventory = () => {
                 {lowStockCount}
               </div>
             </div>
-          </div>
+          </button>
         </div>
+
+        {alert === "expiringSoon" && (
+          <InventoryAlertPanel
+            title="Items expiring within 7 days"
+            type="batches"
+            batches={expiringSoonBatches}
+            productNames={productNames}
+            onClose={() => setAlert(null)}
+          />
+        )}
+        {alert === "expired" && (
+          <InventoryAlertPanel
+            title="Expired product batches"
+            type="batches"
+            batches={expiredBatches}
+            productNames={productNames}
+            onClose={() => setAlert(null)}
+          />
+        )}
+        {alert === "lowStock" && (
+          <InventoryAlertPanel
+            title="Low stock products"
+            type="products"
+            products={lowStockProducts}
+            productNames={productNames}
+            onClose={() => setAlert(null)}
+          />
+        )}
 
         <div className="content-wrapper">
           <div className="toolbar">

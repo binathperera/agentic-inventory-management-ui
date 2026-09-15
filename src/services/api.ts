@@ -238,12 +238,11 @@ export const productBatchService = {
   },
 
   updateBatch: async (
-    productId: string,
-    invoiceNo: string,
+    id: string,
     batch: ProductBatchUpdateRequest,
   ): Promise<ProductBatch> => {
     const response = await api.put<ProductBatch>(
-      `/product-batches/${productId}/${invoiceNo}`,
+      `/product-batches/${id}`,
       batch,
     );
     return response.data;

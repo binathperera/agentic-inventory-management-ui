@@ -34,7 +34,9 @@ const ProductTable = ({
           </thead>
           <tbody>
             {products.map((product) => {
-              const isLowStock = (product.remainingQuantity || 0) < 10;
+              const isLowStock =
+                (product.remainingQuantity || 0) <
+                (product.criticalStockLevel ?? 10);
 
               return (
                 <tr key={product.id}>

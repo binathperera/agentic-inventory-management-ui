@@ -1,16 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "../components/Navigation";
 import "../styles/Dashboard.css";
-import { aiChatService } from "../services/api";
+import { aiChatService, transactionService } from "../services/api";
 //import type { AiChatDocument } from "../types";
-import {
-  Sparkles,
-  Send,
-  //RotateCcw,
-  Clock,
-  AlertTriangle,
-  TrendingUp,
-} from "lucide-react";
+import { Sparkles, Send, ShoppingCart, TrendingUp } from "lucide-react";
+
+const renderHighlightedResponse = (response: string) =>
+  response.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <mark className="ai-chat-highlight" key={`${part}-${index}`}>
+          {part.slice(2, -2)}
+        </mark>
+      );
+    }
+
+    return part;
+  });
 
 const Dashboard = () => {
   const [prompt, setPrompt] = useState("");
@@ -18,6 +24,20 @@ const Dashboard = () => {
   const [lastPrompt, setLastPrompt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalSales, setTotalSales] = useState(0);
+
+  useEffect(() => {
+    const loadSales = async () => {
+      try {
+        const transactions = await transactionService.getAllTransactions();
+        setTotalSales(transactions.length);
+      } catch (err) {
+        console.error("Failed to load dashboard sales", err);
+      }
+    };
+
+    loadSales();
+  }, []);
 
   const handleAsk = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,10 +80,9 @@ const Dashboard = () => {
                 <div className="ai-chat-title-wrapper">
                   <Sparkles className="ai-icon" size={24} />
                   <div>
-                    <h2>AI Inventory Assistant</h2>
+                    <h2>Inventory Operations Assistant</h2>
                     <p className="subtitle">
-                      Ask natural-language questions about inventory, stock, and
-                      orders.
+                      I'm here to help you manage your inventory.
                     </p>
                   </div>
                 </div>
@@ -77,7 +96,7 @@ const Dashboard = () => {
                   id="ai-chat-prompt"
                   className="ai-chat-input"
                   rows={3}
-                  placeholder="Example: Show me items with quantity less than 10 in the Colombo warehouse"
+                  placeholder="Type your question here, e.g., 'Show me low stock items' or 'What are the top-selling products?'"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   disabled={loading}
@@ -96,7 +115,7 @@ const Dashboard = () => {
                     ) : (
                       <>
                         <Send size={18} className="btn-icon" />
-                        Ask AI
+                        Ask Assistant
                       </>
                     )}
                   </button>
@@ -131,7 +150,9 @@ const Dashboard = () => {
                     <div className="ai-chat-empty">No results returned.</div>
                   )}
                   {!loading && results.length > 0 && (
-                    <div className="ai-chat-response">{results}</div>
+                    <div className="ai-chat-response">
+                      {renderHighlightedResponse(results)}
+                    </div>
                   )}
                   {/* {!loading &&
                     results.map((doc, index) => (
@@ -194,27 +215,15 @@ const Dashboard = () => {
               <h3>Key Performance Indicators</h3>
               <div className="kpi-grid">
                 <div className="kpi-widget">
-                  <div className="kpi-icon expired">
-                    <Clock size={24} />
+                  <div className="kpi-icon sales">
+                    <ShoppingCart size={24} />
                   </div>
                   <div className="kpi-content">
-                    <div className="kpi-label">Expired Items</div>
-                    <div className="kpi-value">0</div>
-                  </div>
-                </div>
-                <div className="kpi-widget">
-                  <div className="kpi-icon critical">
-                    <AlertTriangle size={24} />
-                  </div>
-                  <div className="kpi-content">
-                    <div className="kpi-label">Critical Stock</div>
-                    <div className="kpi-value">0</div>
+                    <div className="kpi-label">Total Sales</div>
+                    <div className="kpi-value">{totalSales}</div>
                   </div>
                 </div>
               </div>
-              <p className="kpi-footer">
-                Real-time analytics and insights coming soon.
-              </p>
             </div>
           </div>
         </div>

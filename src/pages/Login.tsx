@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useTenant } from "../contexts/TenantContext";
 import "../styles/Auth.css";
 
 const Login = () => {
@@ -11,6 +12,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
+  const { config } = useTenant();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -35,8 +37,8 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Inventory Management System</h1>
-        <h2>Login</h2>
+        <h1>{config?.brand?.name || "ERP"}</h1>
+        <h2>User Login</h2>
 
         {error && <div className="error-message">{error}</div>}
 

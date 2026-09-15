@@ -102,11 +102,7 @@ const ProductBatchModal = ({
       };
 
       if (batch) {
-        await productBatchService.updateBatch(
-          batch.productId,
-          batch.invoiceNo,
-          batchData
-        );
+        await productBatchService.updateBatch(batch.id, batchData);
       } else {
         await productBatchService.createBatch(batchData);
       }

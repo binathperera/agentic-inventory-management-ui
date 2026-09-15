@@ -32,6 +32,7 @@ export type Product = {
   name: string;
   latestBatchNo: string;
   remainingQuantity?: number;
+  criticalStockLevel?: number;
   latestUnitPrice: number;
 };
 
@@ -39,6 +40,7 @@ export interface ProductCreateRequest {
   id: string;
   name: string;
   remainingQuantity?: number;
+  criticalStockLevel?: number;
   latestUnitPrice?: number;
 }
 
@@ -46,6 +48,7 @@ export interface ProductUpdateRequest {
   id: string;
   name: string;
   remainingQuantity?: number;
+  criticalStockLevel?: number;
   latestUnitPrice?: number;
 }
 

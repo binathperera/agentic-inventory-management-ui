@@ -10,6 +10,7 @@ interface ProductModalProps {
     name: string;
     latestBatchNo?: string;
     remainingQuantity?: number;
+    criticalStockLevel?: number;
     latestUnitPrice?: number;
   }) => Promise<void>;
   onClose: () => void;
@@ -20,6 +21,7 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
   const [name, setName] = useState("");
   const [latestBatchNo, setLatestBatchNo] = useState("");
   const [remainingQuantity, setRemainingQuantity] = useState(0);
+  const [criticalStockLevel, setCriticalStockLevel] = useState(10);
   const [latestUnitPrice, setLatestUnitPrice] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,12 +32,14 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
       setName(product.name);
       setLatestBatchNo(product.latestBatchNo || "");
       setRemainingQuantity(product.remainingQuantity ?? 0);
+      setCriticalStockLevel(product.criticalStockLevel ?? 10);
       setLatestUnitPrice(product.latestUnitPrice ?? 0);
     } else {
       setId("");
       setName("");
       setLatestBatchNo("");
       setRemainingQuantity(0);
+      setCriticalStockLevel(10);
       setLatestUnitPrice(0);
     }
   }, [product]);
@@ -49,13 +53,18 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
       return;
     }
 
-    if (!latestBatchNo.trim()) {
+    if (product && !latestBatchNo.trim()) {
       setError("Batch number is required");
       return;
     }
 
     if (remainingQuantity < 0) {
       setError("Quantity cannot be negative");
+      return;
+    }
+
+    if (criticalStockLevel < 0) {
+      setError("Critical stock level cannot be negative");
       return;
     }
 
@@ -70,8 +79,9 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
       await onSave({
         id: product ? product.id : id,
         name,
-        latestBatchNo,
+        latestBatchNo: product ? latestBatchNo : undefined,
         remainingQuantity,
+        criticalStockLevel,
         latestUnitPrice,
       });
     } catch (err) {
@@ -126,44 +136,62 @@ const ProductModal = ({ product, onSave, onClose }: ProductModalProps) => {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="latestBatchNo">Latest Batch No *</label>
-            <input
-              id="latestBatchNo"
-              type="text"
-              value={latestBatchNo}
-              onChange={(e) => setLatestBatchNo(e.target.value)}
-              required
-              disabled={loading}
-              placeholder="Enter batch number"
-            />
-          </div>
+          {product && (
+            <div className="form-group">
+              <label htmlFor="latestBatchNo">Latest Batch No *</label>
+              <input
+                id="latestBatchNo"
+                type="text"
+                value={latestBatchNo}
+                onChange={(e) => setLatestBatchNo(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="Enter batch number"
+              />
+            </div>
+          )}
 
           <div className="form-row">
+            {product && (
+              <div className="form-group">
+                <label htmlFor="remainingQuantity">Remaining Quantity</label>
+                <input
+                  id="remainingQuantity"
+                  type="number"
+                  value={remainingQuantity}
+                  onChange={(e) => setRemainingQuantity(Number(e.target.value))}
+                  disabled={loading}
+                  min="0"
+                />
+              </div>
+            )}
+
             <div className="form-group">
-              <label htmlFor="remainingQuantity">Remaining Quantity</label>
+              <label htmlFor="criticalStockLevel">Critical Stock Level</label>
               <input
-                id="remainingQuantity"
+                id="criticalStockLevel"
                 type="number"
-                value={remainingQuantity}
-                onChange={(e) => setRemainingQuantity(Number(e.target.value))}
+                value={criticalStockLevel}
+                onChange={(e) => setCriticalStockLevel(Number(e.target.value))}
                 disabled={loading}
                 min="0"
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="latestUnitPrice">Latest Unit Price ($)</label>
-              <input
-                id="latestUnitPrice"
-                type="number"
-                step="0.01"
-                value={latestUnitPrice}
-                onChange={(e) => setLatestUnitPrice(Number(e.target.value))}
-                disabled={loading}
-                min="0"
-              />
-            </div>
+            {product && (
+              <div className="form-group">
+                <label htmlFor="latestUnitPrice">Latest Unit Price ($)</label>
+                <input
+                  id="latestUnitPrice"
+                  type="number"
+                  step="0.01"
+                  value={latestUnitPrice}
+                  onChange={(e) => setLatestUnitPrice(Number(e.target.value))}
+                  disabled={loading}
+                  min="0"
+                />
+              </div>
+            )}
           </div>
 
           {product && (
